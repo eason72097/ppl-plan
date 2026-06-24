@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>居家全身 PPL 訓練計畫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14171a;
+    --panel: #1b1f23;
+    --panel-soft: #20252a;
+    --line: #2c3238;
+    --text: #e9e7e1;
+    --text-dim: #9aa0a6;
+    --push: #ff6b35;
+    --pull: #5bb6c9;
+    --legs: #9ccc4a;
+    --hip: #b489e6;
+    --equip: #5bb6c9;
+    --pelvic: #e3a23a;
+    --push-bg: rgba(255,107,53,0.10);
+    --pull-bg: rgba(91,182,201,0.10);
+    --legs-bg: rgba(156,204,74,0.10);
+    --hip-bg: rgba(180,137,230,0.10);
+    --pelvic-bg: rgba(227,162,58,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Noto Sans TC', system-ui, sans-serif;
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+  .num{font-family:'JetBrains Mono', monospace; font-weight:700;}
+
+  header.top{padding:28px 20px 18px; border-bottom:1px solid var(--line);}
+  header.top h1{font-family:'Oswald', sans-serif; font-weight:700; font-size:26px; letter-spacing:0.5px; margin:0 0 6px; color:var(--text);}
+  header.top p.sub{margin:0 0 14px; color:var(--text-dim); font-size:14px;}
+  .equip-static{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid var(--line); color:var(--text-dim); background:var(--panel-soft);}
+
+  .control-stack{position:sticky; top:0; z-index:50; background:rgba(20,23,26,0.97); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .bar-row{padding:10px 16px; display:flex; gap:8px;}
+  .bar-row.equip-row, .bar-row.focus-row{padding-top:2px; padding-bottom:12px; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  .bar-label{font-size:10.5px; color:var(--text-dim); padding:0 16px; letter-spacing:0.5px; text-transform:uppercase;}
+  .level-btn{flex:1; text-align:center; padding:10px 0; border-radius:10px; border:1px solid var(--line); background:var(--panel); color:var(--text-dim); font-family:'Oswald', sans-serif; font-size:13px; letter-spacing:0.5px; font-weight:600; cursor:pointer;}
+  .level-btn.active{background:var(--hip); border-color:var(--hip); color:#15121a;}
+  .equip-btn, .focus-btn{flex:0 0 auto; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:var(--panel); color:var(--text-dim); font-size:12.5px; font-weight:500; white-space:nowrap; cursor:pointer;}
+  .equip-btn.active{background:var(--equip); border-color:var(--equip); color:#0c2024; font-weight:700;}
+  .equip-btn.all-btn{border-style:dashed;}
+  .focus-btn.pelvic-btn{border-color:var(--pelvic); color:var(--pelvic);}
+  .focus-btn.active{background:var(--pelvic); border-color:var(--pelvic); color:#241a06; font-weight:700;}
+  .focus-btn.active.default-btn{background:var(--text-dim); border-color:var(--text-dim); color:#14171a;}
+
+  nav.jump{display:flex; gap:6px; overflow-x:auto; padding:12px 16px 4px; -webkit-overflow-scrolling:touch;}
+  nav.jump a{flex:0 0 auto; font-size:12.5px; color:var(--text-dim); text-decoration:none; padding:6px 12px; border:1px solid var(--line); border-radius:999px; white-space:nowrap;}
+
+  section{padding:22px 16px 6px;}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:4px;}
+  .section-head h2{font-family:'Oswald', sans-serif; font-size:21px; letter-spacing:0.5px; margin:0;}
+  .section-head .zh{font-size:13px; color:var(--text-dim);}
+  .desc{font-size:13px; color:var(--text-dim); margin:4px 0 14px;}
+
+  .badge-hip{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--hip); border:1px solid var(--hip); background:var(--hip-bg); padding:3px 9px; border-radius:999px; margin-bottom:10px;}
+  .badge-pelvic{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--pelvic); border:1px solid var(--pelvic); background:var(--pelvic-bg); padding:3px 9px; border-radius:999px; margin-bottom:10px;}
+
+  #push .section-head h2{color:var(--push);}
+  #pull .section-head h2{color:var(--pull);}
+  #legs .section-head h2{color:var(--legs);}
+  #warmup .section-head h2, #cooldown .section-head h2{color:var(--hip);}
+  #pelvic .section-head h2{color:var(--pelvic);}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px;}
+  #push .card{border-left:3px solid var(--push); background:linear-gradient(90deg, var(--push-bg), var(--panel) 18%);}
+  #pull .card{border-left:3px solid var(--pull); background:linear-gradient(90deg, var(--pull-bg), var(--panel) 18%);}
+  #legs .card{border-left:3px solid var(--legs); background:linear-gradient(90deg, var(--legs-bg), var(--panel) 18%);}
+  #warmup .card, #cooldown .card{border-left:3px solid var(--hip); background:linear-gradient(90deg, var(--hip-bg), var(--panel) 18%);}
+  #pelvic .card{border-left:3px solid var(--pelvic); background:linear-gradient(90deg, var(--pelvic-bg), var(--panel) 18%);}
+  .card-min{border-style:dashed !important; background:var(--panel-soft) !important;}
+
+  h4.sub{font-family:'Oswald', sans-serif; font-size:13px; letter-spacing:0.4px; color:var(--text-dim); margin:14px 0 6px; text-transform:uppercase;}
+  h4.sub:first-child{margin-top:2px;}
+  h4.sub.ext{opacity:0.75;}
+  h4.sub.ext::after{content:" · 可選加練"; font-weight:400; text-transform:none; letter-spacing:0;}
+  h3.sub{font-family:'Oswald', sans-serif; font-size:15px; letter-spacing:0.3px; color:var(--text-dim); margin:18px 0 8px; text-transform:uppercase;}
+
+  ol.moves{list-style:none; margin:0 0 4px; padding:0; counter-reset:mv;}
+  ol.moves li{counter-increment:mv; display:flex; align-items:center; gap:7px; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  ol.moves li:last-child{border-bottom:none;}
+  ol.moves li::before{
+    content: counter(mv);
+    flex:0 0 20px; height:20px; border-radius:50%;
+    background:var(--panel-soft); color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pose-icon{flex:0 0 auto; width:18px; height:18px; color:var(--text-dim); opacity:0.85;}
+  .mv-name{flex:1;}
+  .mv-set{flex:0 0 auto; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px; color:var(--text); white-space:nowrap;}
+  .lvl-tag{display:none; flex:0 0 auto; font-size:10px; font-weight:700; color:var(--text-dim); background:var(--panel-soft); border:1px solid var(--line); padding:1px 6px; border-radius:5px;}
+  .min-tag{flex:0 0 auto; font-size:10px; font-weight:700; color:var(--pelvic); background:var(--pelvic-bg); border:1px solid var(--pelvic); padding:1px 6px; border-radius:5px;}
+  .vid{flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--panel-soft); border:1px solid var(--line); color:var(--pelvic); text-decoration:none; font-size:10px;}
+
+  .lvl{display:none;}
+  body[data-level="beginner"] .lvl-beginner{display:block;}
+  body[data-level="intermediate"] .lvl-intermediate{display:block;}
+  body[data-level="advanced"] .lvl-advanced{display:block;}
+
+  table.simple{width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.simple th, table.simple td{text-align:left; padding:9px 6px; border-bottom:1px solid var(--line);}
+  table.simple th{color:var(--text-dim); font-weight:500; font-size:12px;}
+  table.simple td.num{white-space:nowrap;}
+
+  .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin:14px 0 4px;}
+  .day{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 2px; text-align:center;}
+  .day .lbl{font-size:10.5px;color:var(--text-dim);}
+  .day .dot{width:9px;height:9px;border-radius:50%; margin:5px auto 0;}
+  .dot.push{background:var(--push);} .dot.pull{background:var(--pull);} .dot.legs{background:var(--legs);} .dot.rest{background:#3a4047;}
+
+  .note{font-size:13px; color:var(--text-dim); margin:8px 0; padding-left:14px; border-left:2px solid var(--line);}
+
+  ul.res{list-style:none; margin:0; padding:0;}
+  ul.res li{padding:10px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  ul.res li:last-child{border-bottom:none;}
+  ul.res .res-title{font-weight:700;display:block;margin-bottom:2px;}
+  ul.res a{color:var(--pull); word-break:break-all; font-size:12.5px;}
+
+  .pose-key{display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 16px;}
+  .pose-key .pk-item{display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-dim); background:var(--panel); border:1px solid var(--line); padding:4px 8px; border-radius:8px;}
+  .pose-key .pk-item svg{width:16px;height:16px;color:var(--text-dim);}
+
+  .filter-hint{display:none; font-size:12.5px; color:var(--equip); padding:10px 16px 0;}
+  body[data-mode="equip"] .filter-hint{display:block;}
+
+  footer{text-align:center; color:var(--text-dim); font-size:12px; padding:30px 20px 10px;}
+
+  /* ---- edit mode ---- */
+  .edit-fab{
+    position:fixed; bottom:18px; right:18px; z-index:80;
+    width:46px; height:46px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--line);
+    color:var(--text-dim); font-size:19px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 12px rgba(0,0,0,0.45);
+    cursor:pointer; user-select:none;
+  }
+  body.edit-mode .edit-fab{display:none;}
+  body.edit-mode{padding-bottom:104px;}
+  .edit-toolbar{
+    display:none;
+    position:fixed; left:0; right:0; bottom:0; z-index:90;
+    background:rgba(20,23,26,0.97); border-top:1px solid var(--pelvic);
+    padding:10px 12px; gap:8px; flex-wrap:wrap; align-items:center;
+    backdrop-filter:blur(6px);
+  }
+  body.edit-mode .edit-toolbar{display:flex;}
+  .edit-toolbar .ed-msg{font-size:11.5px; color:var(--pelvic); flex:1 1 100%; margin:0 0 2px;}
+  .edit-toolbar button{
+    flex:0 0 auto; font-size:12px; padding:8px 12px; border-radius:8px;
+    border:1px solid var(--line); background:var(--panel-soft); color:var(--text);
+    font-family:'Noto Sans TC', sans-serif; cursor:pointer;
+  }
+  .edit-toolbar button.primary{background:var(--pelvic); color:#241a06; border-color:var(--pelvic); font-weight:700;}
+  body.edit-mode [contenteditable="true"]{outline:1px dashed var(--pelvic); outline-offset:2px; border-radius:3px; cursor:text;}
+  body.edit-mode .vid{background:var(--pelvic-bg);}
+  .vid-add{opacity:0.55;}
+  body:not(.edit-mode) .vid-add{display:none !important;}
+</style>
+</head>
+<body data-level="beginner" data-mode="level">
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ic-stand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="4.5" r="2"/><line x1="12" y1="6.5" x2="12" y2="15"/>
+    <line x1="12" y1="9" x2="7" y2="12"/><line x1="12" y1="9" x2="17" y2="12"/>
+    <line x1="12" y1="15" x2="8" y2="21"/><line x1="12" y1="15" x2="16" y2="21"/>
+  </symbol>
+  <symbol id="ic-seated" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="5" r="2"/><line x1="8" y1="7" x2="8" y2="14"/>
+    <line x1="8" y1="9" x2="5" y2="12"/><line x1="8" y1="14" x2="14" y2="14"/>
+    <line x1="14" y1="14" x2="14" y2="20"/><line x1="4" y1="20" x2="20" y2="20"/>
+  </symbol>
+  <symbol id="ic-supine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="2" y1="19" x2="22" y2="19"/><circle cx="5" cy="15" r="2"/>
+    <line x1="7" y1="15" x2="13" y2="15"/><line x1="13" y1="15" x2="16" y2="10"/><line x1="16" y1="10" x2="19" y2="15"/>
+  </symbol>
+  <symbol id="ic-prone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="2" y1="19" x2="22" y2="19"/><circle cx="4" cy="10" r="2"/>
+    <line x1="6" y1="10" x2="19" y2="10"/><line x1="8" y1="10" x2="8" y2="19"/><line x1="15" y1="10" x2="15" y2="19"/>
+  </symbol>
+  <symbol id="ic-side" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="2" y1="19" x2="22" y2="19"/><circle cx="4" cy="9" r="2"/>
+    <line x1="6" y1="9" x2="17" y2="9"/><line x1="8" y1="9" x2="8" y2="19"/><line x1="17" y1="9" x2="20" y2="13"/>
+  </symbol>
+  <symbol id="ic-kneel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="2" y1="21" x2="22" y2="21"/><circle cx="14" cy="4" r="2"/>
+    <line x1="14" y1="6" x2="14" y2="12"/><line x1="14" y1="12" x2="9" y2="12"/>
+    <line x1="9" y1="12" x2="9" y2="21"/><line x1="14" y1="12" x2="19" y2="21"/>
+  </symbol>
+  <symbol id="ic-hang" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="4" x2="19" y2="4"/><line x1="8" y1="4" x2="11" y2="9"/><line x1="16" y1="4" x2="13" y2="9"/>
+    <circle cx="12" cy="11" r="2"/><line x1="12" y1="13" x2="12" y2="18"/>
+    <line x1="12" y1="18" x2="10" y2="21"/><line x1="12" y1="18" x2="14" y2="21"/>
+  </symbol>
+  <symbol id="ic-quad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="2" y1="18" x2="22" y2="18"/><circle cx="4" cy="9" r="2"/>
+    <line x1="6" y1="10" x2="16" y2="10"/><line x1="8" y1="10" x2="8" y2="18"/><line x1="14" y1="10" x2="14" y2="18"/>
+  </symbol>
+</svg>
+
+<header class="top">
+  <h1>居家全身 PPL 訓練計畫</h1>
+  <p class="sub">基礎+延伸豐富菜單・最低/初/中/高 四階難度・附動作姿勢圖示與教學影片</p>
+  <div class="equip-static">
+    <span class="chip">長凳</span><span class="chip">可調啞鈴</span><span class="chip">藥球</span>
+    <span class="chip">單槓</span><span class="chip">TRX</span><span class="chip">彈力帶</span><span class="chip">階梯踏板</span>
+  </div>
+</header>
+
+<div class="control-stack">
+  <div class="bar-label">焦點檢視</div>
+  <div class="bar-row focus-row">
+    <div class="focus-btn active default-btn" data-focus="all">完整訓練(全部)</div>
+    <div class="focus-btn pelvic-btn" data-focus="pelvic">🦴 骨盆穩定訓練</div>
+  </div>
+  <div class="bar-label">依難度瀏覽(虛線卡=最低限度,永遠顯示)</div>
+  <div class="bar-row">
+    <div class="level-btn active" data-set="beginner">初階</div>
+    <div class="level-btn" data-set="intermediate">中階</div>
+    <div class="level-btn" data-set="advanced">高階</div>
+  </div>
+  <div class="bar-label">依器材篩選(顯示所有難度)</div>
+  <div class="bar-row equip-row">
+    <div class="equip-btn all-btn active" data-equip="all">全部</div>
+    <div class="equip-btn" data-equip="bench">長凳</div>
+    <div class="equip-btn" data-equip="dumbbell">可調啞鈴</div>
+    <div class="equip-btn" data-equip="medball">藥球</div>
+    <div class="equip-btn" data-equip="pullupbar">單槓</div>
+    <div class="equip-btn" data-equip="trx">TRX</div>
+    <div class="equip-btn" data-equip="band">彈力帶</div>
+    <div class="equip-btn" data-equip="step">階梯踏板</div>
+  </div>
+</div>
+
+<p class="filter-hint">目前依器材篩選中,顯示所有難度(標籤標示 低/初/中/高)。點「全部」可回到依難度瀏覽。</p>
+
+<nav class="jump">
+  <a href="#warmup">啟動</a><a href="#pelvic">骨盆穩定</a><a href="#push">Push</a><a href="#pull">Pull</a>
+  <a href="#legs">Legs</a><a href="#cooldown">收操</a><a href="#poselegend">圖示說明</a><a href="#week">排法</a>
+  <a href="#progress">漸進原則</a><a href="#resources">資源 / 影片</a>
+</nav>
+
+<section id="warmup" class="filterable">
+  <div class="section-head"><h2>WARM-UP</h2><span class="zh">固定啟動流程</span></div>
+  <span class="badge-hip">● 所有等級皆做・每次訓練前</span>
+
+  <div class="card lvl lvl-beginner">
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">初</span><span class="mv-name">髖屈肌放鬆(手動 / 滾筒)</span><span class="mv-set num">90秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=z4JbDQHJ_2M" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">臀橋</span><span class="mv-set num">15次</span></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-quad"/></svg><span class="lvl-tag">初</span><span class="mv-name">鳥狗式</span><span class="mv-set num">10次/邊</span><a class="vid" href="https://www.youtube.com/watch?v=ZdAHe9_HeEw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">微捲腹(肩胛離地即可)</span><span class="mv-set num">15次</span></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">階梯踏板單腿平衡站立(骨盆穩定加碼)</span><span class="mv-set num">30秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=7SF7AYh2_Yw" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-intermediate">
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">中</span><span class="mv-name">髖屈肌放鬆(手動 / 滾筒)</span><span class="mv-set num">60秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=z4JbDQHJ_2M" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">中</span><span class="mv-name">臀橋</span><span class="mv-set num">15次</span></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-quad"/></svg><span class="lvl-tag">中</span><span class="mv-name">鳥狗式</span><span class="mv-set num">10次/邊</span><a class="vid" href="https://www.youtube.com/watch?v=ZdAHe9_HeEw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">中</span><span class="mv-name">微捲腹(肩胛離地即可)</span><span class="mv-set num">15次</span></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">階梯踏板單腿平衡站立(可閉眼挑戰)</span><span class="mv-set num">40秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=7SF7AYh2_Yw" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-advanced">
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">高</span><span class="mv-name">髖屈肌放鬆(手動 / 滾筒)</span><span class="mv-set num">45秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=z4JbDQHJ_2M" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">臀橋(加彈力帶)</span><span class="mv-set num">20次</span></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-quad"/></svg><span class="lvl-tag">高</span><span class="mv-name">鳥狗式(加停頓)</span><span class="mv-set num">12次/邊</span><a class="vid" href="https://www.youtube.com/watch?v=ZdAHe9_HeEw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">微捲腹(肩胛離地即可)</span><span class="mv-set num">20次</span></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">階梯踏板單腿平衡站立(動態前後點地)</span><span class="mv-set num">45秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=7SF7AYh2_Yw" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+</section>
+
+<section id="pelvic" class="filterable">
+  <div class="section-head"><h2>PELVIC STABILITY</h2><span class="zh">骨盆穩定度訓練(獨立項目)</span></div>
+  <span class="badge-pelvic">● 可徒手或搭配器材・隨難度漸進</span>
+  <p class="desc">獨立於 Push/Pull/Legs 之外,可單獨抽出來做。最低限度版每天都能做。</p>
+
+  <div class="card card-min">
+    <h3 class="sub" style="margin-top:0;">最低限度・每天都能做(徒手)</h3>
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="min-tag">低</span><span class="mv-name">臀橋</span><span class="mv-set num">12次</span></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="min-tag">低</span><span class="mv-name">死蟲式 Dead Bug</span><span class="mv-set num">8次/邊</span><a class="vid" href="https://www.youtube.com/watch?v=g_BYB0R-4Ws" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-quad"/></svg><span class="min-tag">低</span><span class="mv-name">鳥狗式 Bird Dog</span><span class="mv-set num">8次/邊</span><a class="vid" href="https://www.youtube.com/watch?v=ZdAHe9_HeEw" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+
+  <div class="card lvl lvl-beginner">
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">臀橋(頂點停2秒)</span><span class="mv-set num">3×12</span></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">死蟲式 Dead Bug</span><span class="mv-set num">3×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=g_BYB0R-4Ws" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-quad"/></svg><span class="lvl-tag">初</span><span class="mv-name">鳥狗式 Bird Dog</span><span class="mv-set num">3×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=ZdAHe9_HeEw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-side"/></svg><span class="lvl-tag">初</span><span class="mv-name">側躺蛤蜊式 Clamshell</span><span class="mv-set num">2×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=aQVApsdOLSI" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-intermediate">
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">中</span><span class="mv-name">單腳臀橋 Single Leg Glute Bridge</span><span class="mv-set num">3×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=b1zTCyGJXCQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">彈力帶側向走 Lateral Band Walk</span><span class="mv-set num">3×12步/邊</span><a class="vid" href="https://www.youtube.com/watch?v=y_bqFDQZSHQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-side"/></svg><span class="lvl-tag">中</span><span class="mv-name">側平板抗髖下沉 Side Plank Hip Dip</span><span class="mv-set num">3×8/邊</span><a class="vid" href="https://www.youtube.com/watch?v=BWQRVB4LyFI" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">階梯踏板單腿平衡站立</span><span class="mv-set num">40秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=7SF7AYh2_Yw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-seated"/></svg><span class="lvl-tag">中</span><span class="mv-name">90/90 髖外旋拉伸</span><span class="mv-set num">45秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=t4Zz6-aG8Iw" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-advanced">
+    <ol class="moves">
+      <li data-equip="bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">單腳臀橋(腳墊高在長凳上)</span><span class="mv-set num">4×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=b1zTCyGJXCQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-kneel"/></svg><span class="lvl-tag">高</span><span class="mv-name">藥球半跪抗旋砍球 Half-Kneeling Chop</span><span class="mv-set num">3×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=d6QwyvQKMYQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">彈力帶側向走(蹲低姿)</span><span class="mv-set num">3×15步/邊</span><a class="vid" href="https://www.youtube.com/watch?v=y_bqFDQZSHQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-side"/></svg><span class="lvl-tag">高</span><span class="mv-name">側平板抗髖下沉(加抬腿)</span><span class="mv-set num">4×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=BWQRVB4LyFI" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">階梯踏板單腿平衡(閉眼+動態點地)</span><span class="mv-set num">45秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=7SF7AYh2_Yw" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+</section>
+
+<section id="push" class="filterable">
+  <div class="section-head"><h2>PUSH DAY</h2><span class="zh">胸・肩・三頭・抗旋核心</span></div>
+  <p class="desc">基礎 = 每次都做的核心動作;延伸 = 有時間/體力時加練,補強肩後側與胸部變化角度。</p>
+
+  <div class="card card-min">
+    <h3 class="sub" style="margin-top:0;">最低限度版</h3>
+    <ol class="moves">
+      <li data-equip="dumbbell bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="min-tag">低</span><span class="mv-name">啞鈴胸推</span><span class="mv-set num">2×8</span><a class="vid" href="https://www.youtube.com/watch?v=5Y3VZsLb1Ys" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="min-tag">低</span><span class="mv-name">TRX 伏地挺身(斜角簡化版)</span><span class="mv-set num">2×8</span><a class="vid" href="https://www.youtube.com/watch?v=OlUqeytSoxE" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+
+  <div class="card lvl lvl-beginner">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴胸推(長凳)</span><span class="mv-set num">3×10</span><a class="vid" href="https://www.youtube.com/watch?v=5Y3VZsLb1Ys" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell bench"><svg class="pose-icon"><use href="#ic-seated"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴坐姿肩推(長凳靠背)</span><span class="mv-set num">3×10</span><a class="vid" href="https://www.youtube.com/watch?v=B-aVuyhvLHU" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">初</span><span class="mv-name">TRX 伏地挺身(斜角簡化版)</span><span class="mv-set num">3×10</span><a class="vid" href="https://www.youtube.com/watch?v=OlUqeytSoxE" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">藥球過頭捲腹</span><span class="mv-set num">2×12</span></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">彈力帶站姿推胸</span><span class="mv-set num">2×12</span><a class="vid" href="https://www.youtube.com/watch?v=6-86jEAXA08" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">彈力帶肩外旋(肩後側健康)</span><span class="mv-set num">2×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=_UvmPNGtlPM" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-intermediate">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">中</span><span class="mv-name">啞鈴胸推</span><span class="mv-set num">4×10</span><a class="vid" href="https://www.youtube.com/watch?v=5Y3VZsLb1Ys" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">啞鈴站姿肩推</span><span class="mv-set num">3×10</span><a class="vid" href="https://www.youtube.com/watch?v=B-aVuyhvLHU" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">中</span><span class="mv-name">TRX 伏地挺身(標準角度)</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=OlUqeytSoxE" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">藥球站姿旋轉(髖部穩定不甩動)</span><span class="mv-set num">3×12/邊</span></li>
+      <li data-equip="bench"><svg class="pose-icon"><use href="#ic-seated"/></svg><span class="lvl-tag">中</span><span class="mv-name">長凳三頭撐體</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=DWBnTBIw1oM" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">彈力帶站姿推胸(加大阻力)</span><span class="mv-set num">3×15</span><a class="vid" href="https://www.youtube.com/watch?v=6-86jEAXA08" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">啞鈴側平舉(肩中束,補寬度)</span><span class="mv-set num">2×12</span><a class="vid" href="https://www.youtube.com/watch?v=XPPfnSEATJA" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-advanced">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">啞鈴胸推(慢速離心3秒)</span><span class="mv-set num">4×8</span><a class="vid" href="https://www.youtube.com/watch?v=5Y3VZsLb1Ys" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">單臂啞鈴肩推</span><span class="mv-set num">4×8/邊</span><a class="vid" href="https://www.youtube.com/watch?v=B-aVuyhvLHU" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx bench"><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">高</span><span class="mv-name">TRX 伏地挺身(腳抬高版)</span><span class="mv-set num">4×12</span><a class="vid" href="https://www.youtube.com/watch?v=OlUqeytSoxE" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">藥球爆發式拋接(對牆)</span><span class="mv-set num">4×10</span><a class="vid" href="https://www.youtube.com/watch?v=CkO1mfSBvv4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="bench"><svg class="pose-icon"><use href="#ic-seated"/></svg><span class="lvl-tag">高</span><span class="mv-name">三頭撐體(腳抬高在長凳上)</span><span class="mv-set num">4×12</span><a class="vid" href="https://www.youtube.com/watch?v=DWBnTBIw1oM" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">彈力帶單臂推胸(抗旋)</span><span class="mv-set num">3×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=6-86jEAXA08" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">啞鈴胸飛鳥(胸部伸展角度)</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=MJsgciiE1H0" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+</section>
+
+<section id="pull" class="filterable">
+  <div class="section-head"><h2>PULL DAY</h2><span class="zh">背・二頭・臀大肌・髖伸肌</span></div>
+  <p class="desc">基礎 = 核心拉的動作 + 臀部伸展;延伸 = 補強肩後側、下背伸肌與握力,這些是原本菜單缺的部分。</p>
+
+  <div class="card card-min">
+    <h3 class="sub" style="margin-top:0;">最低限度版</h3>
+    <ol class="moves">
+      <li data-equip="pullupbar"><svg class="pose-icon"><use href="#ic-hang"/></svg><span class="min-tag">低</span><span class="mv-name">單槓輔助引體向上(或慢速離心放下)</span><span class="mv-set num">2×5</span><a class="vid" href="https://www.youtube.com/watch?v=7_256WBiSR4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="min-tag">低</span><span class="mv-name">長凳肩靠臀橋推舉</span><span class="mv-set num">2×10</span><a class="vid" href="https://www.youtube.com/watch?v=j59jWsUbl8A" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+
+  <div class="card lvl lvl-beginner">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="pullupbar"><svg class="pose-icon"><use href="#ic-hang"/></svg><span class="lvl-tag">初</span><span class="mv-name">單槓輔助引體向上(或慢速離心放下)</span><span class="mv-set num">3×5</span><a class="vid" href="https://www.youtube.com/watch?v=7_256WBiSR4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">TRX 站姿划船(角度大、較輕鬆)</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=iT_oaf3k0Xw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">長凳肩靠臀橋推舉(頂點停2秒)</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=j59jWsUbl8A" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴彎舉</span><span class="mv-set num">2×12</span><a class="vid" href="https://www.youtube.com/watch?v=XE_pHwbst04" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">藥球甩擲地面(控制版,輕重量)</span><span class="mv-set num">2×10</span><a class="vid" href="https://www.youtube.com/watch?v=CkO1mfSBvv4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴肩後束飛鳥(對抗前側壓力)</span><span class="mv-set num">2×12</span><a class="vid" href="https://www.youtube.com/watch?v=zqWVolge-Tk" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-intermediate">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="pullupbar"><svg class="pose-icon"><use href="#ic-hang"/></svg><span class="lvl-tag">中</span><span class="mv-name">單槓引體向上(全程或輔助)</span><span class="mv-set num">4×6-8</span><a class="vid" href="https://www.youtube.com/watch?v=7_256WBiSR4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">TRX 划船(角度加大)</span><span class="mv-set num">4×12</span><a class="vid" href="https://www.youtube.com/watch?v=iT_oaf3k0Xw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="bench"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">中</span><span class="mv-name">長凳單腳髖推 Hip Thrust</span><span class="mv-set num">3×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=CGklM00rO9o" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">啞鈴彎舉</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=XE_pHwbst04" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">彈力帶 Face Pull</span><span class="mv-set num">3×15</span><a class="vid" href="https://www.youtube.com/watch?v=JBpj9-3tP0c" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">藥球甩擲地面</span><span class="mv-set num">3×12</span><a class="vid" href="https://www.youtube.com/watch?v=CkO1mfSBvv4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-prone"/></svg><span class="lvl-tag">中</span><span class="mv-name">棒式背肌伸展 Superman(下背補強)</span><span class="mv-set num">2×12</span><a class="vid" href="https://www.youtube.com/watch?v=J9zXkxUAfUA" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-advanced">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="pullupbar"><svg class="pose-icon"><use href="#ic-hang"/></svg><span class="lvl-tag">高</span><span class="mv-name">單槓引體向上(可加負重或慢速離心)</span><span class="mv-set num">4×8-10</span><a class="vid" href="https://www.youtube.com/watch?v=7_256WBiSR4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">TRX 單臂划船</span><span class="mv-set num">4×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=iT_oaf3k0Xw" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="bench dumbbell"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">長凳單腳髖推(腳墊高、加重)</span><span class="mv-set num">4×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=CGklM00rO9o" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">啞鈴交替慢速彎舉</span><span class="mv-set num">4×10</span><a class="vid" href="https://www.youtube.com/watch?v=XE_pHwbst04" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">彈力帶 Face Pull + 肩外旋</span><span class="mv-set num">4×15</span><a class="vid" href="https://www.youtube.com/watch?v=JBpj9-3tP0c" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="medball"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">藥球甩擲地面(全力,快節奏)</span><span class="mv-set num">4×12</span><a class="vid" href="https://www.youtube.com/watch?v=CkO1mfSBvv4" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="pullupbar"><svg class="pose-icon"><use href="#ic-hang"/></svg><span class="lvl-tag">高</span><span class="mv-name">單槓懸吊 Dead Hang(握力+肩胸椎減壓)</span><span class="mv-set num">3×30秒</span><a class="vid" href="https://www.youtube.com/watch?v=x0QbLW6fa7A" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+</section>
+
+<section id="legs" class="filterable">
+  <div class="section-head"><h2>LEG DAY</h2><span class="zh">股四頭・臀肌・小腿</span></div>
+  <p class="desc">基礎 = 蹲/髖鉸鏈/單側下肢;延伸 = 補小腿與內收肌,原菜單完全沒練到這兩個部位。</p>
+
+  <div class="card card-min">
+    <h3 class="sub" style="margin-top:0;">最低限度版</h3>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="min-tag">低</span><span class="mv-name">啞鈴高腳杯蹲</span><span class="mv-set num">2×8</span><a class="vid" href="https://www.youtube.com/watch?v=jZOvxOKYUFc" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="min-tag">低</span><span class="mv-name">直膝抬腿(慢速)</span><span class="mv-set num">2×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=QWwg3d-N6Wg" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+
+  <div class="card lvl lvl-beginner">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴高腳杯蹲</span><span class="mv-set num">3×10</span><a class="vid" href="https://www.youtube.com/watch?v=jZOvxOKYUFc" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">階梯踏板 Step-up</span><span class="mv-set num">3×8/邊</span><a class="vid" href="https://www.youtube.com/watch?v=aKj-6hgiViA" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">初</span><span class="mv-name">直膝抬腿(慢速,髖屈肌拮抗訓練)</span><span class="mv-set num">3×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=QWwg3d-N6Wg" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴 RDL(羅馬尼亞硬舉)</span><span class="mv-set num">3×10</span><a class="vid" href="https://www.youtube.com/watch?v=aa57T45iFSE" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">彈力帶側向走(髖外側穩定)</span><span class="mv-set num">2×10步/邊</span><a class="vid" href="https://www.youtube.com/watch?v=y_bqFDQZSHQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">初</span><span class="mv-name">啞鈴提踵(小腿,原菜單缺)</span><span class="mv-set num">2×15</span><a class="vid" href="https://www.youtube.com/watch?v=SRUtMJ0tE2A" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-intermediate">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">啞鈴高腳杯蹲(加重)</span><span class="mv-set num">4×10</span><a class="vid" href="https://www.youtube.com/watch?v=jZOvxOKYUFc" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="step dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">階梯踏板 Step-up(手持啞鈴)</span><span class="mv-set num">4×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=aKj-6hgiViA" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">TRX 反向跨步蹲</span><span class="mv-set num">3×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=p7jVUY7eGr0" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">單腳啞鈴 RDL</span><span class="mv-set num">3×8/邊</span><a class="vid" href="https://www.youtube.com/watch?v=9Tv9Iatoq9Y" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">中</span><span class="mv-name">直膝抬腿 + 小腿上提組合</span><span class="mv-set num">3×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=QWwg3d-N6Wg" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">中</span><span class="mv-name">彈力帶側向走</span><span class="mv-set num">3×12步/邊</span><a class="vid" href="https://www.youtube.com/watch?v=y_bqFDQZSHQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-side"/></svg><span class="lvl-tag">中</span><span class="mv-name">側躺內收肌訓練(原菜單缺)</span><span class="mv-set num">2×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=lhwT35sshrI" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+  <div class="card lvl lvl-advanced">
+    <h4 class="sub">基礎</h4>
+    <ol class="moves">
+      <li data-equip="bench dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">保加利亞分腿蹲(長凳輔助後腳抬高)</span><span class="mv-set num">4×8/邊</span><a class="vid" href="https://www.youtube.com/watch?v=DeCnHqrN22U" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="step dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">階梯踏板 Step-up(加重、加快節奏)</span><span class="mv-set num">4×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=aKj-6hgiViA" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="trx"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">TRX 反向跨步蹲(慢速離心3秒)</span><span class="mv-set num">4×10/邊</span><a class="vid" href="https://www.youtube.com/watch?v=p7jVUY7eGr0" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+    <h4 class="sub ext">延伸</h4>
+    <ol class="moves">
+      <li data-equip="dumbbell"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">單腳啞鈴 RDL(加重)</span><span class="mv-set num">4×8/邊</span><a class="vid" href="https://www.youtube.com/watch?v=9Tv9Iatoq9Y" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-supine"/></svg><span class="lvl-tag">高</span><span class="mv-name">直膝抬腿(加彈力帶阻力)</span><span class="mv-set num">4×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=QWwg3d-N6Wg" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="band"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">彈力帶側向走(蹲低姿)</span><span class="mv-set num">3×15步/邊</span><a class="vid" href="https://www.youtube.com/watch?v=y_bqFDQZSHQ" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip="step"><svg class="pose-icon"><use href="#ic-stand"/></svg><span class="lvl-tag">高</span><span class="mv-name">階梯踏板單腳提踵(小腿+平衡)</span><span class="mv-set num">3×12/邊</span><a class="vid" href="https://www.youtube.com/watch?v=d6Cv1qKF_Jk" target="_blank" rel="noopener">▶</a></li>
+    </ol>
+  </div>
+</section>
+
+<section id="cooldown" class="filterable">
+  <div class="section-head"><h2>COOL-DOWN</h2><span class="zh">固定收操流程</span></div>
+  <span class="badge-hip">● 所有等級皆做・每次訓練後</span>
+  <div class="card">
+    <ol class="moves">
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-kneel"/></svg><span class="mv-name">髖屈肌弓箭步拉伸</span><span class="mv-set num">45秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=iZ1eZBY4fwM" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-seated"/></svg><span class="mv-name">90/90 髖外旋 或 鴿式拉伸</span><span class="mv-set num">45秒/邊</span><a class="vid" href="https://www.youtube.com/watch?v=PFYDMkkDnJ8" target="_blank" rel="noopener">▶</a></li>
+      <li data-equip=""><svg class="pose-icon"><use href="#ic-seated"/></svg><span class="mv-name">深呼吸放鬆</span><span class="mv-set num">1-2分鐘</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="poselegend">
+  <div class="section-head"><h2>LEGEND</h2><span class="zh">動作姿勢圖示說明</span></div>
+  <div class="pose-key">
+    <span class="pk-item"><svg><use href="#ic-stand"/></svg>站立</span>
+    <span class="pk-item"><svg><use href="#ic-seated"/></svg>坐姿</span>
+    <span class="pk-item"><svg><use href="#ic-supine"/></svg>躺・面朝上</span>
+    <span class="pk-item"><svg><use href="#ic-prone"/></svg>撐地・面朝下</span>
+    <span class="pk-item"><svg><use href="#ic-side"/></svg>側躺/側撐</span>
+    <span class="pk-item"><svg><use href="#ic-kneel"/></svg>跪姿/半跪</span>
+    <span class="pk-item"><svg><use href="#ic-hang"/></svg>懸吊(單槓)</span>
+    <span class="pk-item"><svg><use href="#ic-quad"/></svg>四足跪姿</span>
+  </div>
+</section>
+
+<section id="week">
+  <div class="section-head"><h2>WEEKLY</h2><span class="zh">每週排法範例</span></div>
+  <h3 class="sub">範例 A・最低頻率(3次/週)</h3>
+  <div class="week-grid">
+    <div class="day"><div class="lbl">一</div><div class="dot push"></div></div>
+    <div class="day"><div class="lbl">二</div><div class="dot rest"></div></div>
+    <div class="day"><div class="lbl">三</div><div class="dot pull"></div></div>
+    <div class="day"><div class="lbl">四</div><div class="dot rest"></div></div>
+    <div class="day"><div class="lbl">五</div><div class="dot legs"></div></div>
+    <div class="day"><div class="lbl">六</div><div class="dot rest"></div></div>
+    <div class="day"><div class="lbl">日</div><div class="dot rest"></div></div>
+  </div>
+  <p class="note">忙/累的那天,直接用各天的「最低限度版」頂著;基礎做完若還有餘力才加「延伸」,不要硬撐延伸而犧牲基礎品質。</p>
+  <h3 class="sub">範例 B・兩輪/週(中高階適用)</h3>
+  <div class="week-grid">
+    <div class="day"><div class="lbl">一</div><div class="dot push"></div></div>
+    <div class="day"><div class="lbl">二</div><div class="dot pull"></div></div>
+    <div class="day"><div class="lbl">三</div><div class="dot legs"></div></div>
+    <div class="day"><div class="lbl">四</div><div class="dot rest"></div></div>
+    <div class="day"><div class="lbl">五</div><div class="dot push"></div></div>
+    <div class="day"><div class="lbl">六</div><div class="dot pull"></div></div>
+    <div class="day"><div class="lbl">日</div><div class="dot legs"></div></div>
+  </div>
+  <p class="note">可自行挪一天改為完全休息,依疲勞狀況調整。</p>
+</section>
+
+<section id="progress">
+  <div class="section-head"><h2>PROGRESS</h2><span class="zh">漸進與調整原則</span></div>
+  <div class="card">
+    <table class="simple">
+      <tr><td>基礎 vs 延伸</td><td>基礎是每次都要做的核心動作;延伸是補弱點的加練,完全可選,沒時間就跳過</td></tr>
+      <tr><td>最低限度的用途</td><td>沒時間/很累/沒動力時,只做最低限度版也算完成,不算中斷紀錄</td></tr>
+      <tr><td>升級時機</td><td>同一動作做滿該級上限後,下次升一級難度版本,或增加重量 / 放慢離心速度</td></tr>
+      <tr><td>降級時機</td><td>髖屈肌當天特別緊繃 → 腿日自動降一級或改用最低限度版</td></tr>
+      <tr><td>進度檢核</td><td>每 2 週用「直膝抬腿角度」或「跨步蹲下蹲深度」自我評估一次</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="section-head"><h2>RESOURCES</h2><span class="zh">Darebee 資源 + 動作教學影片</span></div>
+
+  <h3 class="sub">Darebee・PPL 主程式</h3>
+  <ul class="res">
+    <li><span class="res-title">Push Pull Legs(28天循環式分項計畫)</span><a href="https://darebee.com/programs/push-pull-legs.html">darebee.com/programs/push-pull-legs.html</a></li>
+    <li><span class="res-title">PPL Push A / B</span><a href="https://darebee.com/workouts/ppl-push-a-workout.html">ppl-push-a-workout.html</a> ・ <a href="https://darebee.com/workouts/ppl-push-b-workout.html">ppl-push-b-workout.html</a></li>
+    <li><span class="res-title">PPL Pull A / B</span><a href="https://darebee.com/workouts/ppl-pull-a-workout.html">ppl-pull-a-workout.html</a> ・ <a href="https://darebee.com/workouts/ppl-pull-b-workout.html">ppl-pull-b-workout.html</a></li>
+    <li><span class="res-title">PPL Legs A / B</span><a href="https://darebee.com/workouts/ppl-legs-a-workout.html">ppl-legs-a-workout.html</a> ・ <a href="https://darebee.com/workouts/ppl-legs-b-workout.html">ppl-legs-b-workout.html</a></li>
+  </ul>
+
+  <h3 class="sub">Darebee・單槓 / 臀肌 / 髖部</h3>
+  <ul class="res">
+    <li><span class="res-title">Pull-Up Bar Workouts 合輯</span><a href="https://darebee.com/collections/pullup-bar-workouts.html">collections/pullup-bar-workouts.html</a></li>
+    <li><span class="res-title">Touch The Bar</span><a href="https://darebee.com/plans/touch-the-bar.html">plans/touch-the-bar.html</a></li>
+    <li><span class="res-title">Glute Workouts 合輯</span><a href="https://darebee.com/collections/glute-workouts.html">collections/glute-workouts.html</a></li>
+    <li><span class="res-title">Hip Flexors / Tight Hips / Hips & Glutes Stretch</span><a href="https://darebee.com/workouts/hip-flexors-workout.html">hip-flexors-workout.html</a> ・ <a href="https://darebee.com/workouts/tight-hips-workout.html">tight-hips-workout.html</a> ・ <a href="https://darebee.com/workouts/hips-and-glutes-stretch-workout.html">hips-and-glutes-stretch-workout.html</a></li>
+  </ul>
+
+  <h3 class="sub">教學影片・啟動 / 骨盆穩定 / 收操</h3>
+  <ul class="res">
+    <li><span class="res-title">髖屈肌滾筒放鬆</span><a href="https://www.youtube.com/watch?v=z4JbDQHJ_2M">youtube.com/watch?v=z4JbDQHJ_2M</a></li>
+    <li><span class="res-title">鳥狗式 Bird Dog(NASM)</span><a href="https://www.youtube.com/watch?v=ZdAHe9_HeEw">youtube.com/watch?v=ZdAHe9_HeEw</a></li>
+    <li><span class="res-title">死蟲式 Dead Bug</span><a href="https://www.youtube.com/watch?v=g_BYB0R-4Ws">youtube.com/watch?v=g_BYB0R-4Ws</a></li>
+    <li><span class="res-title">側躺蛤蜊式 Clamshell</span><a href="https://www.youtube.com/watch?v=aQVApsdOLSI">youtube.com/watch?v=aQVApsdOLSI</a></li>
+    <li><span class="res-title">單腳臀橋</span><a href="https://www.youtube.com/watch?v=b1zTCyGJXCQ">youtube.com/watch?v=b1zTCyGJXCQ</a></li>
+    <li><span class="res-title">側平板抗髖下沉</span><a href="https://www.youtube.com/watch?v=BWQRVB4LyFI">youtube.com/watch?v=BWQRVB4LyFI</a></li>
+    <li><span class="res-title">彈力帶側向走</span><a href="https://www.youtube.com/watch?v=y_bqFDQZSHQ">youtube.com/watch?v=y_bqFDQZSHQ</a></li>
+    <li><span class="res-title">90/90 髖外旋拉伸</span><a href="https://www.youtube.com/watch?v=t4Zz6-aG8Iw">youtube.com/watch?v=t4Zz6-aG8Iw</a></li>
+    <li><span class="res-title">藥球半跪抗旋砍球</span><a href="https://www.youtube.com/watch?v=d6QwyvQKMYQ">youtube.com/watch?v=d6QwyvQKMYQ</a></li>
+    <li><span class="res-title">單腿平衡站立</span><a href="https://www.youtube.com/watch?v=7SF7AYh2_Yw">youtube.com/watch?v=7SF7AYh2_Yw</a></li>
+    <li><span class="res-title">髖屈肌弓箭步拉伸</span><a href="https://www.youtube.com/watch?v=iZ1eZBY4fwM">youtube.com/watch?v=iZ1eZBY4fwM</a></li>
+    <li><span class="res-title">鴿式拉伸</span><a href="https://www.youtube.com/watch?v=PFYDMkkDnJ8">youtube.com/watch?v=PFYDMkkDnJ8</a></li>
+  </ul>
+
+  <h3 class="sub">教學影片・Push(含新增延伸動作)</h3>
+  <ul class="res">
+    <li><span class="res-title">啞鈴胸推</span><a href="https://www.youtube.com/watch?v=5Y3VZsLb1Ys">youtube.com/watch?v=5Y3VZsLb1Ys</a></li>
+    <li><span class="res-title">啞鈴肩推</span><a href="https://www.youtube.com/watch?v=B-aVuyhvLHU">youtube.com/watch?v=B-aVuyhvLHU</a></li>
+    <li><span class="res-title">TRX 伏地挺身</span><a href="https://www.youtube.com/watch?v=OlUqeytSoxE">youtube.com/watch?v=OlUqeytSoxE</a></li>
+    <li><span class="res-title">彈力帶站姿推胸</span><a href="https://www.youtube.com/watch?v=6-86jEAXA08">youtube.com/watch?v=6-86jEAXA08</a></li>
+    <li><span class="res-title">長凳三頭撐體</span><a href="https://www.youtube.com/watch?v=DWBnTBIw1oM">youtube.com/watch?v=DWBnTBIw1oM</a></li>
+    <li><span class="res-title">[新] 彈力帶肩外旋(Ask Doctor Jo)</span><a href="https://www.youtube.com/watch?v=_UvmPNGtlPM">youtube.com/watch?v=_UvmPNGtlPM</a></li>
+    <li><span class="res-title">[新] 啞鈴側平舉(NASM)</span><a href="https://www.youtube.com/watch?v=XPPfnSEATJA">youtube.com/watch?v=XPPfnSEATJA</a></li>
+    <li><span class="res-title">[新] 啞鈴胸飛鳥</span><a href="https://www.youtube.com/watch?v=MJsgciiE1H0">youtube.com/watch?v=MJsgciiE1H0</a></li>
+  </ul>
+
+  <h3 class="sub">教學影片・Pull(含新增延伸動作)</h3>
+  <ul class="res">
+    <li><span class="res-title">單槓輔助引體向上(TRX輔助)</span><a href="https://www.youtube.com/watch?v=7_256WBiSR4">youtube.com/watch?v=7_256WBiSR4</a></li>
+    <li><span class="res-title">TRX 划船</span><a href="https://www.youtube.com/watch?v=iT_oaf3k0Xw">youtube.com/watch?v=iT_oaf3k0Xw</a></li>
+    <li><span class="res-title">長凳肩靠臀橋推舉</span><a href="https://www.youtube.com/watch?v=j59jWsUbl8A">youtube.com/watch?v=j59jWsUbl8A</a></li>
+    <li><span class="res-title">長凳單腳髖推 Hip Thrust</span><a href="https://www.youtube.com/watch?v=CGklM00rO9o">youtube.com/watch?v=CGklM00rO9o</a></li>
+    <li><span class="res-title">啞鈴彎舉</span><a href="https://www.youtube.com/watch?v=XE_pHwbst04">youtube.com/watch?v=XE_pHwbst04</a></li>
+    <li><span class="res-title">藥球甩擲地面</span><a href="https://www.youtube.com/watch?v=CkO1mfSBvv4">youtube.com/watch?v=CkO1mfSBvv4</a></li>
+    <li><span class="res-title">彈力帶 Face Pull</span><a href="https://www.youtube.com/watch?v=JBpj9-3tP0c">youtube.com/watch?v=JBpj9-3tP0c</a></li>
+    <li><span class="res-title">[新] 啞鈴肩後束飛鳥(HASfit)</span><a href="https://www.youtube.com/watch?v=zqWVolge-Tk">youtube.com/watch?v=zqWVolge-Tk</a></li>
+    <li><span class="res-title">[新] Superman 背肌伸展</span><a href="https://www.youtube.com/watch?v=J9zXkxUAfUA">youtube.com/watch?v=J9zXkxUAfUA</a></li>
+    <li><span class="res-title">[新] 單槓懸吊 Dead Hang</span><a href="https://www.youtube.com/watch?v=x0QbLW6fa7A">youtube.com/watch?v=x0QbLW6fa7A</a></li>
+  </ul>
+
+  <h3 class="sub">教學影片・Legs(含新增延伸動作)</h3>
+  <ul class="res">
+    <li><span class="res-title">啞鈴高腳杯蹲</span><a href="https://www.youtube.com/watch?v=jZOvxOKYUFc">youtube.com/watch?v=jZOvxOKYUFc</a></li>
+    <li><span class="res-title">階梯踏板 Step-up</span><a href="https://www.youtube.com/watch?v=aKj-6hgiViA">youtube.com/watch?v=aKj-6hgiViA</a></li>
+    <li><span class="res-title">直膝抬腿</span><a href="https://www.youtube.com/watch?v=QWwg3d-N6Wg">youtube.com/watch?v=QWwg3d-N6Wg</a></li>
+    <li><span class="res-title">啞鈴 RDL(NASM)</span><a href="https://www.youtube.com/watch?v=aa57T45iFSE">youtube.com/watch?v=aa57T45iFSE</a></li>
+    <li><span class="res-title">單腳啞鈴 RDL</span><a href="https://www.youtube.com/watch?v=9Tv9Iatoq9Y">youtube.com/watch?v=9Tv9Iatoq9Y</a></li>
+    <li><span class="res-title">TRX 反向跨步蹲</span><a href="https://www.youtube.com/watch?v=p7jVUY7eGr0">youtube.com/watch?v=p7jVUY7eGr0</a></li>
+    <li><span class="res-title">保加利亞分腿蹲</span><a href="https://www.youtube.com/watch?v=DeCnHqrN22U">youtube.com/watch?v=DeCnHqrN22U</a></li>
+    <li><span class="res-title">[新] 啞鈴提踵(小腿)</span><a href="https://www.youtube.com/watch?v=SRUtMJ0tE2A">youtube.com/watch?v=SRUtMJ0tE2A</a></li>
+    <li><span class="res-title">[新] 側躺內收肌訓練</span><a href="https://www.youtube.com/watch?v=lhwT35sshrI">youtube.com/watch?v=lhwT35sshrI</a></li>
+    <li><span class="res-title">[新] 階梯踏板單腳提踵(Ask Doctor Jo)</span><a href="https://www.youtube.com/watch?v=d6Cv1qKF_Jk">youtube.com/watch?v=d6Cv1qKF_Jk</a></li>
+  </ul>
+</section>
+
+<footer>依難度瀏覽:初/中/高,每級分「基礎」與「延伸(可選)」。虛線卡片「最低限度版」永遠顯示。依器材瀏覽:點任一器材。骨盆穩定訓練:點橘色焦點按鈕單獨顯示。▶ 開教學影片,圖示說明動作姿勢(見 LEGEND)。不點下方 🔧 不會進入編輯模式。</footer>
+
+<div class="edit-fab" id="editFab" title="編輯模式">🔧</div>
+<div class="edit-toolbar" id="editToolbar">
+  <p class="ed-msg">編輯模式中:點動作名稱/組數可直接改字;點 ▶ 換影片連結;沒有▶的動作會出現「＋」可新增連結。</p>
+  <p class="ed-msg" id="cloudStatus">☁ 連接雲端中...</p>
+  <button id="edSave">💾 儲存(此瀏覽器)</button>
+  <button id="edDownload" class="primary">⬇ 下載更新版檔案</button>
+  <button id="edReset">↩ 還原預設</button>
+  <button id="edExit">✕ 結束編輯</button>
+</div>
+
+<script>
+  var levelBtns = document.querySelectorAll('.level-btn');
+  var equipBtns = document.querySelectorAll('.equip-btn');
+  var focusBtns = document.querySelectorAll('.focus-btn');
+  var lvlCards = document.querySelectorAll('.lvl');
+  var moveLis = document.querySelectorAll('ol.moves li');
+  var moveOls = document.querySelectorAll('ol.moves');
+  var cards = document.querySelectorAll('.card');
+  var sections = document.querySelectorAll('section.filterable');
+  var extraIds = ['week','progress','resources','poselegend'];
+
+  function applyFocusVisibility(){
+    var activeBtn = document.querySelector('.focus-btn.active');
+    var mode = activeBtn ? activeBtn.getAttribute('data-focus') : 'all';
+    sections.forEach(function(s){
+      if(mode === 'pelvic'){
+        s.style.display = (s.id === 'pelvic') ? '' : 'none';
+      } else {
+        s.style.display = '';
+      }
+    });
+    extraIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.style.display = (mode === 'pelvic') ? 'none' : '';
+    });
+  }
+
+  function resetSubHeadings(){
+    moveOls.forEach(function(ol){
+      ol.style.display = '';
+      var prev = ol.previousElementSibling;
+      if(prev && prev.tagName === 'H4' && prev.classList.contains('sub')){
+        prev.style.display = '';
+      }
+    });
+  }
+
+  function clearEquipFilter(){
+    moveLis.forEach(function(li){ li.style.display = ''; });
+    cards.forEach(function(c){ c.style.display = ''; });
+    lvlCards.forEach(function(c){ c.style.display = ''; });
+    resetSubHeadings();
+    document.body.setAttribute('data-mode','level');
+    applyFocusVisibility();
+  }
+
+  function applyEquipFilter(key){
+    moveLis.forEach(function(li){
+      var eq = (li.getAttribute('data-equip') || '').split(' ').filter(Boolean);
+      li.style.display = eq.indexOf(key) !== -1 ? 'flex' : 'none';
+    });
+    lvlCards.forEach(function(c){ c.style.display = 'block'; });
+    moveOls.forEach(function(ol){
+      var visible = Array.prototype.some.call(ol.querySelectorAll('li'), function(li){ return li.style.display !== 'none'; });
+      ol.style.display = visible ? '' : 'none';
+      var prev = ol.previousElementSibling;
+      if(prev && prev.tagName === 'H4' && prev.classList.contains('sub')){
+        prev.style.display = visible ? '' : 'none';
+      }
+    });
+    cards.forEach(function(card){
+      var visible = Array.prototype.some.call(card.querySelectorAll('ol.moves li'), function(li){
+        return li.style.display !== 'none';
+      });
+      card.style.display = visible ? 'block' : 'none';
+    });
+    sections.forEach(function(sec){
+      var visible = Array.prototype.some.call(sec.querySelectorAll('ol.moves li'), function(li){
+        return li.style.display !== 'none';
+      });
+      sec.style.display = visible ? 'block' : 'none';
+    });
+    document.body.setAttribute('data-mode','equip');
+  }
+
+  levelBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      levelBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      equipBtns.forEach(function(b){ b.classList.remove('active'); });
+      document.querySelector('.equip-btn.all-btn').classList.add('active');
+      clearEquipFilter();
+      document.body.setAttribute('data-level', btn.getAttribute('data-set'));
+    });
+  });
+
+  equipBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var key = btn.getAttribute('data-equip');
+      equipBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      if(key === 'all'){
+        clearEquipFilter();
+      } else {
+        applyEquipFilter(key);
+      }
+    });
+  });
+
+  focusBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      focusBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      applyFocusVisibility();
+      if(btn.getAttribute('data-focus') === 'pelvic'){
+        document.getElementById('pelvic').scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    });
+  });
+
+  /* ===================== 編輯模式(雲端同步版) ===================== */
+  var STORAGE_KEY = 'pplEdits_v1';
+  var currentEdits = {};
+  var cloudReady = false;
+
+  function loadLocalCache(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ return {}; }
+  }
+  function saveLocalCache(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(currentEdits)); } catch(e){}
+  }
+  function setCloudStatus(text){
+    var el = document.getElementById('cloudStatus');
+    if(el) el.textContent = text;
+  }
+
+  function persistEdits(){
+    saveLocalCache();
+    if(window.cloudSaveEdits){
+      window.cloudSaveEdits(currentEdits).then(function(){
+        setCloudStatus('☁ 已同步到雲端');
+      }).catch(function(err){
+        console.error(err);
+        setCloudStatus('⚠ 雲端儲存失敗,已暫存在本機');
+      });
+    } else {
+      setCloudStatus('⚠ 尚未連接雲端,只存在本機');
+    }
+  }
+
+  function pathKey(el){
+    var path = [];
+    var node = el;
+    while(node && node.tagName && node !== document.body){
+      var parent = node.parentElement;
+      if(!parent) break;
+      var same = Array.prototype.filter.call(parent.children, function(c){ return c.tagName === node.tagName; });
+      path.unshift(node.tagName + ':' + same.indexOf(node));
+      node = parent;
+    }
+    return path.join('>');
+  }
+
+  function applyAllEdits(){
+    document.querySelectorAll('.mv-name, .mv-set').forEach(function(el){
+      var k = pathKey(el);
+      if(currentEdits[k] !== undefined) el.textContent = currentEdits[k];
+    });
+    document.querySelectorAll('.vid').forEach(function(el){
+      var k = pathKey(el) + ':href';
+      if(currentEdits[k] !== undefined) el.setAttribute('href', currentEdits[k]);
+    });
+    document.querySelectorAll('ol.moves li').forEach(function(li){
+      if(li.querySelector('.vid')) return;
+      var k = pathKey(li) + ':addedVid';
+      if(currentEdits[k]){
+        var a = document.createElement('a');
+        a.className = 'vid'; a.target = '_blank'; a.rel = 'noopener';
+        a.href = currentEdits[k]; a.textContent = '▶';
+        li.appendChild(a);
+      }
+    });
+  }
+
+  function initCloudSync(){
+    if(window.cloudLoadEdits){
+      window.cloudLoadEdits().then(function(data){
+        currentEdits = data || {};
+        cloudReady = true;
+        saveLocalCache();
+        applyAllEdits();
+        setCloudStatus('☁ 已連接雲端,內容已同步');
+      }).catch(function(err){
+        console.error(err);
+        currentEdits = loadLocalCache();
+        applyAllEdits();
+        setCloudStatus('⚠ 連不到雲端,顯示本機暫存版本');
+      });
+    } else {
+      currentEdits = loadLocalCache();
+      applyAllEdits();
+      setCloudStatus('⚠ 尚未設定雲端同步');
+    }
+  }
+  window.initCloudSync = initCloudSync;
+  // 立即先用本機暫存內容顯示,避免空白等待;雲端資料回來後會自動覆蓋更新
+  currentEdits = loadLocalCache();
+  applyAllEdits();
+
+  function wireEditable(){
+    var on = document.body.classList.contains('edit-mode');
+    document.querySelectorAll('.mv-name, .mv-set').forEach(function(el){
+      el.setAttribute('contenteditable', on ? 'true' : 'false');
+    });
+  }
+  function injectAddButtons(){
+    document.querySelectorAll('ol.moves li').forEach(function(li){
+      if(li.querySelector('.vid') || li.querySelector('.vid-add')) return;
+      var a = document.createElement('a');
+      a.href = '#'; a.className = 'vid vid-add'; a.textContent = '＋';
+      li.appendChild(a);
+    });
+  }
+  function removeAddButtons(){
+    document.querySelectorAll('.vid-add').forEach(function(el){ el.remove(); });
+  }
+
+  function setEditMode(on){
+    document.body.classList.toggle('edit-mode', on);
+    wireEditable();
+    if(on){ injectAddButtons(); } else { removeAddButtons(); }
+  }
+
+  document.getElementById('editFab').addEventListener('click', function(){ setEditMode(true); });
+  document.getElementById('edExit').addEventListener('click', function(){ setEditMode(false); });
+
+  document.getElementById('edSave').addEventListener('click', function(){
+    persistEdits();
+    alert('內容會即時同步到雲端(Firebase),任何裝置打開這個網址都會看到同樣的版本。\n\n如果剛剛網路不穩,也已經先暫存在這個瀏覽器裡,之後連上網會自動補同步。');
+  });
+
+  document.getElementById('edDownload').addEventListener('click', function(){
+    var wasEdit = document.body.classList.contains('edit-mode');
+    if(wasEdit){ setEditMode(false); }
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    var blob = new Blob([html], {type:'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = '居家PPL訓練計畫_自訂版.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if(wasEdit){ setEditMode(true); }
+  });
+
+  document.getElementById('edReset').addEventListener('click', function(){
+    if(confirm('確定要清除所有自訂的文字 / 影片連結,還原成原始內容?(雲端與本機的紀錄都會被清空,所有裝置都會看到原始版本)')){
+      currentEdits = {};
+      localStorage.removeItem(STORAGE_KEY);
+      if(window.cloudSaveEdits){
+        window.cloudSaveEdits({}).then(function(){ location.reload(); }).catch(function(){ location.reload(); });
+      } else {
+        location.reload();
+      }
+    }
+  });
+
+  document.addEventListener('focusout', function(e){
+    if(!document.body.classList.contains('edit-mode')) return;
+    var el = e.target;
+    if(el && el.classList && (el.classList.contains('mv-name') || el.classList.contains('mv-set'))){
+      currentEdits[pathKey(el)] = el.textContent.trim();
+      persistEdits();
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if(!document.body.classList.contains('edit-mode')) return;
+    var vid = e.target.closest ? e.target.closest('.vid:not(.vid-add)') : null;
+    if(vid){
+      e.preventDefault();
+      var cur = vid.getAttribute('href') || '';
+      var nv = prompt('輸入新的影片連結(YouTube網址):', cur);
+      if(nv !== null){
+        nv = nv.trim();
+        if(nv){
+          vid.setAttribute('href', nv);
+          currentEdits[pathKey(vid) + ':href'] = nv;
+          persistEdits();
+        }
+      }
+      return;
+    }
+    var addBtn = e.target.closest ? e.target.closest('.vid-add') : null;
+    if(addBtn){
+      e.preventDefault();
+      var li = addBtn.closest('li');
+      var nv2 = prompt('輸入要加入的影片連結(YouTube網址):', 'https://www.youtube.com/watch?v=');
+      if(nv2){
+        nv2 = nv2.trim();
+        if(nv2 && li){
+          var a2 = document.createElement('a');
+          a2.className = 'vid'; a2.target = '_blank'; a2.rel = 'noopener';
+          a2.href = nv2; a2.textContent = '▶';
+          li.replaceChild(a2, addBtn);
+          currentEdits[pathKey(li) + ':addedVid'] = nv2;
+          persistEdits();
+        }
+      }
+    }
+  });
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyD68ASVlyKiBOdvcyqIjil1DLNhibaxiaM",
+    authDomain: "ppl-plan.firebaseapp.com",
+    projectId: "ppl-plan",
+    storageBucket: "ppl-plan.firebasestorage.app",
+    messagingSenderId: "91585219195",
+    appId: "1:91585219195:web:f1ce4e153622965f1930de"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+  var editsDocRef = doc(db, "pplEdits", "main");
+
+  window.cloudLoadEdits = function(){
+    return getDoc(editsDocRef).then(function(snap){
+      if(snap.exists()){
+        return snap.data().data || {};
+      }
+      return {};
+    });
+  };
+
+  window.cloudSaveEdits = function(editsObj){
+    return setDoc(editsDocRef, { data: editsObj, updatedAt: Date.now() });
+  };
+
+  if(window.initCloudSync){ window.initCloudSync(); }
+</script>
+
+</body>
+</html>
