@@ -244,13 +244,24 @@
   .hist-stat{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px;}
   .hist-stat .hs-num{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--legs);}
   .hist-stat .hs-label{font-size:11px; color:var(--text-dim); margin-top:2px;}
-  .heatmap-wrap{overflow-x:auto; padding-bottom:6px; margin-bottom:18px;}
-  .heatmap{display:flex; gap:3px;}
-  .hm-col{display:flex; flex-direction:column; gap:3px;}
-  .hm-cell{width:13px; height:13px; border-radius:3px; background:var(--panel-soft); border:1px solid var(--line);}
-  .hm-legend{display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:var(--text-dim); margin-bottom:18px;}
-  .hm-legend span{display:inline-flex; align-items:center; gap:4px;}
-  .hm-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+  .cal-block{margin-bottom:22px;}
+  .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .cal-title{font-size:13.5px; font-weight:700;}
+  .cal-nav{
+    width:28px; height:28px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel-soft); color:var(--text-dim); font-size:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px;}
+  .cal-dow{font-size:10px; color:var(--text-dim); text-align:center; padding-bottom:2px;}
+  .cal-cell{
+    aspect-ratio:1; border-radius:6px; background:var(--panel-soft); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:10.5px; color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .cal-cell.empty{visibility:hidden;}
+  .cal-cell.today{box-shadow:inset 0 0 0 1.5px var(--text);}
+  .cal-count{font-size:11.5px; color:var(--text-dim); margin-top:6px;}
   .hist-list-item{
     background:var(--panel); border:1px solid var(--line); border-radius:12px;
     padding:12px 14px; margin-bottom:10px;
@@ -612,22 +623,44 @@
 
 <section id="history">
   <div class="section-head"><h2>HISTORY</h2><span class="zh">訓練紀錄</span></div>
-  <p class="desc">這裡顯示你用左下角「📝 記錄」存下的每一次訓練。沒有「連續天數」這種容易失真的指標,只給你看得到、算得清楚的數字。</p>
+  <p class="desc">這裡顯示你用左下角「📝 記錄」存下的每一次訓練。每按一次儲存都會獨立存下來,同一天記不同類型、或忘了補記前幾天,都不會互相覆蓋。</p>
   <div class="hist-stats" id="histStats">
     <div class="hist-stat"><div class="hs-num" id="hsWeek">–</div><div class="hs-label">本週已記錄</div></div>
     <div class="hist-stat"><div class="hs-num" id="hsMonth">–</div><div class="hs-label">本月已記錄</div></div>
     <div class="hist-stat"><div class="hs-num" id="hsTotal">–</div><div class="hs-label">累積總紀錄</div></div>
     <div class="hist-stat"><div class="hs-num" id="hsSince">–</div><div class="hs-label">距上次紀錄</div></div>
   </div>
-  <div class="heatmap-wrap"><div class="heatmap" id="heatmap"></div></div>
-  <div class="hm-legend">
-    <span><i style="background:var(--push)"></i>Push</span>
-    <span><i style="background:var(--pull)"></i>Pull</span>
-    <span><i style="background:var(--legs)"></i>Legs</span>
-    <span><i style="background:var(--pelvic)"></i>骨盆穩定</span>
-    <span><i style="background:var(--run)"></i>跑步/走路</span>
-    <span><i style="background:var(--panel-soft); border:1px solid var(--line);"></i>沒有紀錄</span>
+
+  <div class="cal-block">
+    <div class="cal-head">
+      <div class="cal-nav" data-cal="pelvic" data-dir="-1">‹</div>
+      <span class="cal-title" id="calTitle-pelvic" style="color:var(--pelvic);">🦴 骨盆穩定訓練</span>
+      <div class="cal-nav" data-cal="pelvic" data-dir="1">›</div>
+    </div>
+    <div class="cal-grid" id="calGrid-pelvic"></div>
+    <div class="cal-count" id="calCount-pelvic">本月 0 次</div>
   </div>
+
+  <div class="cal-block">
+    <div class="cal-head">
+      <div class="cal-nav" data-cal="ppl" data-dir="-1">‹</div>
+      <span class="cal-title" id="calTitle-ppl" style="color:var(--legs);">💪 PPL(Push/Pull/Legs)</span>
+      <div class="cal-nav" data-cal="ppl" data-dir="1">›</div>
+    </div>
+    <div class="cal-grid" id="calGrid-ppl"></div>
+    <div class="cal-count" id="calCount-ppl">本月 0 次</div>
+  </div>
+
+  <div class="cal-block">
+    <div class="cal-head">
+      <div class="cal-nav" data-cal="run" data-dir="-1">‹</div>
+      <span class="cal-title" id="calTitle-run" style="color:var(--run);">🏃 跑步/走路</span>
+      <div class="cal-nav" data-cal="run" data-dir="1">›</div>
+    </div>
+    <div class="cal-grid" id="calGrid-run"></div>
+    <div class="cal-count" id="calCount-run">本月 0 次</div>
+  </div>
+
   <div id="historyList"><p class="hist-empty">載入中...</p></div>
 </section>
 
@@ -1264,10 +1297,11 @@
     }
     msg.textContent = '儲存中...';
     msg.style.color = '';
-    window.cloudSaveLog(dateStr, logObj).then(function(){
-      msg.textContent = '已儲存!';
+    window.cloudSaveLog(logObj).then(function(){
+      msg.textContent = '已儲存!可以繼續選別的類型/日期再存一筆';
       msg.style.color = 'var(--legs)';
-      setTimeout(closeLogPanel, 900);
+      if(window.renderHistory) window.renderHistory();
+      setTimeout(function(){ document.getElementById('lgMsg').textContent=''; }, 2200);
     }).catch(function(err){
       console.error(err);
       msg.textContent = '儲存失敗,請檢查網路連線';
@@ -1277,8 +1311,8 @@
 
   /* ===================== 訓練紀錄(歷史儀表板) ===================== */
   function dateOnly(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
-  function parseLogDate(id){
-    var p = id.split('-');
+  function parseLogDate(dateStr){
+    var p = dateStr.split('-');
     return new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
   }
   function startOfWeek(d){
@@ -1293,7 +1327,8 @@
     var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
     var weekCount = 0, monthCount = 0;
     logs.forEach(function(l){
-      var d = parseLogDate(l.id);
+      if(!l.date) return;
+      var d = parseLogDate(l.date);
       if(d >= weekStart) weekCount++;
       if(d >= monthStart) monthCount++;
     });
@@ -1301,49 +1336,97 @@
     document.getElementById('hsMonth').textContent = monthCount;
     document.getElementById('hsTotal').textContent = logs.length;
     var sinceText = '–';
-    if(logs.length){
-      var diffDays = Math.round((today - parseLogDate(logs[0].id)) / 86400000);
+    if(logs.length && logs[0].date){
+      var diffDays = Math.round((today - parseLogDate(logs[0].date)) / 86400000);
       sinceText = diffDays === 0 ? '今天' : (diffDays + ' 天前');
     }
     document.getElementById('hsSince').textContent = sinceText;
   }
 
-  function renderHeatmap(logs){
-    var byDate = {};
-    logs.forEach(function(l){ byDate[l.id] = l; });
-    var container = document.getElementById('heatmap');
-    container.innerHTML = '';
-    var weeks = 12;
-    var today = dateOnly(new Date());
-    var end = startOfWeek(today);
-    end.setDate(end.getDate() + 6);
-    var cursor = new Date(end);
-    cursor.setDate(cursor.getDate() - (weeks*7 - 1));
-    for(var w=0; w<weeks; w++){
-      var col = document.createElement('div');
-      col.className = 'hm-col';
-      for(var d=0; d<7; d++){
-        var cell = document.createElement('div');
-        cell.className = 'hm-cell';
-        var key = cursor.getFullYear()+'-'+String(cursor.getMonth()+1).padStart(2,'0')+'-'+String(cursor.getDate()).padStart(2,'0');
-        if(cursor > today){
-          cell.style.visibility = 'hidden';
-        } else {
-          var log = byDate[key];
-          if(log){
-            var color = getComputedStyle(document.documentElement).getPropertyValue('--'+log.dayType).trim();
-            if(color){ cell.style.background = color; cell.style.borderColor = color; }
-            cell.title = key + ' · ' + (DAY_LABEL[log.dayType] || log.dayType);
-          } else {
-            cell.title = key;
-          }
-        }
-        col.appendChild(cell);
-        cursor.setDate(cursor.getDate()+1);
-      }
-      container.appendChild(col);
+  /* ---- 三個獨立月曆(骨盆穩定 / PPL / 跑步) ---- */
+  var DAY_CATS = {
+    pelvic: function(t){ return t === 'pelvic'; },
+    ppl: function(t){ return t === 'push' || t === 'pull' || t === 'legs'; },
+    run: function(t){ return t === 'run'; }
+  };
+  var CAL_LABEL = { pelvic:'🦴 骨盆穩定訓練', ppl:'💪 PPL(Push/Pull/Legs)', run:'🏃 跑步/走路' };
+  var calState = {};
+  var historyLogsCache = [];
+
+  function renderCalendar(catKey){
+    if(!calState[catKey]){
+      var now = new Date();
+      calState[catKey] = { y: now.getFullYear(), m: now.getMonth() };
     }
+    var st = calState[catKey];
+    var matchFn = DAY_CATS[catKey];
+    var monthLogs = historyLogsCache.filter(function(l){
+      if(!l.date || !matchFn(l.dayType)) return false;
+      var p = l.date.split('-');
+      return parseInt(p[0],10) === st.y && (parseInt(p[1],10)-1) === st.m;
+    });
+    var byDay = {};
+    monthLogs.forEach(function(l){
+      var day = parseInt(l.date.split('-')[2],10);
+      if(!byDay[day]) byDay[day] = l;
+    });
+
+    document.getElementById('calTitle-'+catKey).textContent = CAL_LABEL[catKey] + ' · ' + st.y + '年' + (st.m+1) + '月';
+
+    var grid = document.getElementById('calGrid-'+catKey);
+    grid.innerHTML = '';
+    ['日','一','二','三','四','五','六'].forEach(function(w){
+      var el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = w;
+      grid.appendChild(el);
+    });
+
+    var firstDow = new Date(st.y, st.m, 1).getDay();
+    var daysInMonth = new Date(st.y, st.m+1, 0).getDate();
+    var today = new Date();
+    var isCurMonth = today.getFullYear() === st.y && today.getMonth() === st.m;
+
+    for(var i=0;i<firstDow;i++){
+      var blank = document.createElement('div');
+      blank.className = 'cal-cell empty';
+      grid.appendChild(blank);
+    }
+    for(var d=1; d<=daysInMonth; d++){
+      var cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      cell.textContent = d;
+      var log = byDay[d];
+      if(log){
+        var color = getComputedStyle(document.documentElement).getPropertyValue('--'+log.dayType).trim();
+        if(color){
+          cell.style.background = color;
+          cell.style.borderColor = color;
+          cell.style.color = '#10260a';
+          cell.style.fontWeight = '700';
+        }
+        cell.title = (DAY_LABEL[log.dayType] || log.dayType);
+      }
+      if(isCurMonth && d === today.getDate()){ cell.classList.add('today'); }
+      grid.appendChild(cell);
+    }
+    document.getElementById('calCount-'+catKey).textContent = '本月 ' + monthLogs.length + ' 次';
   }
+
+  document.querySelectorAll('.cal-nav').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var cat = btn.getAttribute('data-cal');
+      var dir = parseInt(btn.getAttribute('data-dir'),10);
+      if(!calState[cat]){
+        var now = new Date();
+        calState[cat] = { y: now.getFullYear(), m: now.getMonth() };
+      }
+      calState[cat].m += dir;
+      if(calState[cat].m < 0){ calState[cat].m = 11; calState[cat].y--; }
+      if(calState[cat].m > 11){ calState[cat].m = 0; calState[cat].y++; }
+      renderCalendar(cat);
+    });
+  });
 
   function renderHistList(logs){
     var box = document.getElementById('historyList');
@@ -1371,7 +1454,7 @@
       if(l.tightness){ noteLine = '緊繃度 '+l.tightness+'/10' + (l.note ? '・'+l.note : ''); }
       else if(l.note){ noteLine = l.note; }
       html += '<div class="hist-list-item"><div class="hl-top">'
-        + '<span class="hl-date">'+l.id+'</span>'
+        + '<span class="hl-date">'+(l.date||'–')+'</span>'
         + '<span class="hl-tag" style="background:'+color+';color:#10260a;">'+tagText+'</span>'
         + '</div>'
         + (noteLine ? '<div class="hl-note">'+noteLine+'</div>' : '')
@@ -1391,8 +1474,11 @@
     }
     document.getElementById('historyList').innerHTML = '<p class="hist-empty">載入中...</p>';
     window.cloudLoadAllLogs().then(function(logs){
+      historyLogsCache = logs;
       renderHistStats(logs);
-      renderHeatmap(logs);
+      renderCalendar('pelvic');
+      renderCalendar('ppl');
+      renderCalendar('run');
       renderHistList(logs);
     }).catch(function(err){
       console.error(err);
@@ -1403,7 +1489,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   var firebaseConfig = {
     apiKey: "AIzaSyD68ASVlyKiBOdvcyqIjil1DLNhibaxiaM",
@@ -1431,17 +1517,18 @@
     return setDoc(editsDocRef, { data: editsObj, updatedAt: Date.now() });
   };
 
-  /* ---- training logs ---- */
-  window.cloudSaveLog = function(dateStr, logObj){
-    var ref = doc(db, "pplLogs", dateStr);
-    return setDoc(ref, logObj);
+  /* ---- training logs ----
+     每一次「儲存」都是獨立的一筆紀錄(自動產生 ID),
+     同一天記兩種類型、或同一天同類型記兩次,都不會互相覆蓋。 */
+  window.cloudSaveLog = function(logObj){
+    return addDoc(collection(db, "pplLogs"), logObj);
   };
 
   window.cloudLoadAllLogs = function(){
     return getDocs(collection(db, "pplLogs")).then(function(snap){
       var arr = [];
       snap.forEach(function(d){ arr.push(Object.assign({ id: d.id }, d.data())); });
-      arr.sort(function(a,b){ return a.id < b.id ? 1 : -1; }); // 新到舊
+      arr.sort(function(a,b){ return (a.date < b.date) ? 1 : (a.date > b.date ? -1 : (b.savedAt||0)-(a.savedAt||0)); });
       return arr;
     });
   };
