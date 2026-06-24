@@ -20,11 +20,13 @@
     --hip: #b489e6;
     --equip: #5bb6c9;
     --pelvic: #e3a23a;
+    --run: #5b8def;
     --push-bg: rgba(255,107,53,0.10);
     --pull-bg: rgba(91,182,201,0.10);
     --legs-bg: rgba(156,204,74,0.10);
     --hip-bg: rgba(180,137,230,0.10);
     --pelvic-bg: rgba(227,162,58,0.12);
+    --run-bg: rgba(91,141,239,0.12);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -623,6 +625,7 @@
     <span><i style="background:var(--pull)"></i>Pull</span>
     <span><i style="background:var(--legs)"></i>Legs</span>
     <span><i style="background:var(--pelvic)"></i>骨盆穩定</span>
+    <span><i style="background:var(--run)"></i>跑步/走路</span>
     <span><i style="background:var(--panel-soft); border:1px solid var(--line);"></i>沒有紀錄</span>
   </div>
   <div id="historyList"><p class="hist-empty">載入中...</p></div>
@@ -787,10 +790,11 @@
         <div class="lg-chip" data-day="pull">Pull</div>
         <div class="lg-chip" data-day="legs">Legs</div>
         <div class="lg-chip" data-day="pelvic">骨盆穩定</div>
+        <div class="lg-chip" data-day="run">🏃 跑步/走路</div>
       </div>
     </div>
 
-    <div class="lg-row">
+    <div class="lg-row" id="lgLevelRow">
       <span class="lg-label">難度</span>
       <div class="lg-chip-row" id="lgLevel">
         <div class="lg-chip" data-lv="min">最低限度</div>
@@ -800,10 +804,19 @@
       </div>
     </div>
 
-    <div class="lg-row">
+    <div class="lg-row" id="lgExListRow">
       <span class="lg-label">動作紀錄(重量×次數,或時間,自由填寫)</span>
       <div class="lg-exlist" id="lgExList"><p class="lg-empty-hint">先選上面的類型和難度</p></div>
     </div>
+
+    <div class="lg-row" id="lgRunRow" style="display:none;">
+      <span class="lg-label">跑步 / 走路時間(分鐘,留空代表沒有)</span>
+      <div class="lg-exlist">
+        <div class="lg-ex-row"><span class="lg-ex-name">🏃 跑步時間</span><input type="text" id="lgRunMin" placeholder="例如 25"></div>
+        <div class="lg-ex-row"><span class="lg-ex-name">🚶 走路時間</span><input type="text" id="lgWalkMin" placeholder="例如 10"></div>
+      </div>
+    </div>
+
 
     <div class="lg-row">
       <span class="lg-label">髖屈肌 / 整體緊繃度(1 = 很放鬆,10 = 很緊繃)</span>
@@ -1133,7 +1146,7 @@
   });
 
   /* ===================== 訓練紀錄(記錄面板) ===================== */
-  var DAY_LABEL = { push:'Push', pull:'Pull', legs:'Legs', pelvic:'骨盆穩定' };
+  var DAY_LABEL = { push:'Push', pull:'Pull', legs:'Legs', pelvic:'骨盆穩定', run:'跑步/走路' };
   var LEVEL_LABEL = { min:'最低限度', beginner:'初階', intermediate:'中階', advanced:'高階' };
   var lgState = { day:null, level:null };
 
@@ -1186,7 +1199,16 @@
       document.querySelectorAll('#lgDayType .lg-chip').forEach(function(c){ c.classList.remove('active'); });
       chip.classList.add('active');
       lgState.day = chip.getAttribute('data-day');
-      renderLgExList();
+      var isRun = lgState.day === 'run';
+      document.getElementById('lgLevelRow').style.display = isRun ? 'none' : '';
+      document.getElementById('lgExListRow').style.display = isRun ? 'none' : '';
+      document.getElementById('lgRunRow').style.display = isRun ? '' : 'none';
+      if(isRun){
+        document.querySelectorAll('#lgLevel .lg-chip').forEach(function(c){ c.classList.remove('active'); });
+        lgState.level = null;
+      } else {
+        renderLgExList();
+      }
     });
   });
   document.querySelectorAll('#lgLevel .lg-chip').forEach(function(chip){
@@ -1204,27 +1226,37 @@
 
   document.getElementById('lgSave').addEventListener('click', function(){
     var msg = document.getElementById('lgMsg');
-    if(!lgState.day || !lgState.level){
-      msg.textContent = '請先選類型和難度';
+    if(!lgState.day){
+      msg.textContent = '請先選類型';
+      msg.style.color = '#ff6b35';
+      return;
+    }
+    if(lgState.day !== 'run' && !lgState.level){
+      msg.textContent = '請先選難度';
       msg.style.color = '#ff6b35';
       return;
     }
     var dateStr = document.getElementById('lgDate').value || todayStr();
-    var exercises = [];
-    document.querySelectorAll('#lgExList .lg-ex-row').forEach(function(row){
-      var name = row.querySelector('.lg-ex-name').textContent;
-      var val = row.querySelector('input').value.trim();
-      exercises.push({ name: name, detail: val });
-    });
     var logObj = {
       date: dateStr,
       dayType: lgState.day,
-      level: lgState.level,
       tightness: parseInt(document.getElementById('lgTightness').value, 10),
       note: document.getElementById('lgNote').value.trim(),
-      exercises: exercises,
       savedAt: Date.now()
     };
+    if(lgState.day === 'run'){
+      logObj.runMinutes = document.getElementById('lgRunMin').value.trim();
+      logObj.walkMinutes = document.getElementById('lgWalkMin').value.trim();
+    } else {
+      logObj.level = lgState.level;
+      var exercises = [];
+      document.querySelectorAll('#lgExList .lg-ex-row').forEach(function(row){
+        var name = row.querySelector('.lg-ex-name').textContent;
+        var val = row.querySelector('input').value.trim();
+        exercises.push({ name: name, detail: val });
+      });
+      logObj.exercises = exercises;
+    }
     if(!window.cloudSaveLog){
       msg.textContent = '雲端尚未連接,無法儲存';
       msg.style.color = '#ff6b35';
@@ -1326,12 +1358,21 @@
       (l.exercises || []).forEach(function(ex){
         if(ex.detail) exHtml += '<div class="hl-ex"><span>'+ex.name+'</span><span>'+ex.detail+'</span></div>';
       });
+      var tagText;
+      if(l.dayType === 'run'){
+        var parts = [];
+        if(l.runMinutes) parts.push('跑 '+l.runMinutes+'分');
+        if(l.walkMinutes) parts.push('走 '+l.walkMinutes+'分');
+        tagText = (DAY_LABEL[l.dayType]||l.dayType) + (parts.length ? ' · '+parts.join(' / ') : '');
+      } else {
+        tagText = (DAY_LABEL[l.dayType]||l.dayType) + ' · ' + (LEVEL_LABEL[l.level]||l.level);
+      }
       var noteLine = '';
       if(l.tightness){ noteLine = '緊繃度 '+l.tightness+'/10' + (l.note ? '・'+l.note : ''); }
       else if(l.note){ noteLine = l.note; }
       html += '<div class="hist-list-item"><div class="hl-top">'
         + '<span class="hl-date">'+l.id+'</span>'
-        + '<span class="hl-tag" style="background:'+color+';color:#10260a;">'+(DAY_LABEL[l.dayType]||l.dayType)+' · '+(LEVEL_LABEL[l.level]||l.level)+'</span>'
+        + '<span class="hl-tag" style="background:'+color+';color:#10260a;">'+tagText+'</span>'
         + '</div>'
         + (noteLine ? '<div class="hl-note">'+noteLine+'</div>' : '')
         + (exHtml ? '<div class="hl-detail">'+exHtml+'</div>' : '')
