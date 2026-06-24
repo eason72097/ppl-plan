@@ -53,8 +53,10 @@
   .equip-btn.active{background:var(--equip); border-color:var(--equip); color:#0c2024; font-weight:700;}
   .equip-btn.all-btn{border-style:dashed;}
   .focus-btn.pelvic-btn{border-color:var(--pelvic); color:var(--pelvic);}
+  .focus-btn.hist-btn{border-color:var(--legs); color:var(--legs);}
   .focus-btn.active{background:var(--pelvic); border-color:var(--pelvic); color:#241a06; font-weight:700;}
   .focus-btn.active.default-btn{background:var(--text-dim); border-color:var(--text-dim); color:#14171a;}
+  .focus-btn.active.hist-btn{background:var(--legs); border-color:var(--legs); color:#10260a;}
 
   nav.jump{display:flex; gap:6px; overflow-x:auto; padding:12px 16px 4px; -webkit-overflow-scrolling:touch;}
   nav.jump a{flex:0 0 auto; font-size:12.5px; color:var(--text-dim); text-decoration:none; padding:6px 12px; border:1px solid var(--line); border-radius:999px; white-space:nowrap;}
@@ -169,6 +171,96 @@
   body.edit-mode .vid{background:var(--pelvic-bg);}
   .vid-add{opacity:0.55;}
   body:not(.edit-mode) .vid-add{display:none !important;}
+
+  /* ---- training log ---- */
+  .log-fab{
+    position:fixed; bottom:18px; left:18px; z-index:80;
+    width:46px; height:46px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--legs);
+    color:var(--legs); font-size:19px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 12px rgba(0,0,0,0.45);
+    cursor:pointer; user-select:none;
+  }
+  body.edit-mode .log-fab{display:none;}
+
+  .log-overlay{
+    display:none;
+    position:fixed; inset:0; z-index:95;
+    background:rgba(10,12,14,0.78);
+    padding:16px;
+    overflow-y:auto;
+  }
+  .log-overlay.open{display:block;}
+  .log-card{
+    max-width:480px; margin:30px auto 60px;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:16px; padding:18px 16px;
+  }
+  .log-card h3{font-family:'Oswald',sans-serif; font-size:18px; margin:0 0 4px; color:var(--legs);}
+  .log-card .lg-sub{font-size:12px; color:var(--text-dim); margin:0 0 14px;}
+  .lg-row{margin-bottom:14px;}
+  .lg-label{font-size:11.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; display:block;}
+  .lg-chip-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .lg-chip{
+    flex:0 0 auto; padding:7px 12px; border-radius:999px; font-size:12.5px;
+    border:1px solid var(--line); background:var(--panel-soft); color:var(--text-dim); cursor:pointer;
+  }
+  .lg-chip.active{background:var(--legs); border-color:var(--legs); color:#10260a; font-weight:700;}
+  .lg-date{
+    width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel-soft); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px;
+  }
+  .lg-exlist{border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:var(--panel-soft);}
+  .lg-ex-row{display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); font-size:13px;}
+  .lg-ex-row:last-child{border-bottom:none;}
+  .lg-ex-row .lg-ex-name{flex:1; color:var(--text);}
+  .lg-ex-row input[type="text"]{
+    flex:0 0 38%; min-width:0; padding:6px 8px; border-radius:6px; border:1px solid var(--line);
+    background:var(--bg); color:var(--text); font-size:12px; font-family:'JetBrains Mono',monospace;
+  }
+  .lg-empty-hint{font-size:12px; color:var(--text-dim); padding:6px 2px;}
+  .lg-slider-row{display:flex; align-items:center; gap:10px;}
+  .lg-slider-row input[type="range"]{flex:1;}
+  .lg-slider-val{font-family:'JetBrains Mono',monospace; font-weight:700; width:24px; text-align:center; color:var(--legs);}
+  .lg-note{
+    width:100%; min-height:54px; padding:8px 10px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel-soft); color:var(--text); font-family:'Noto Sans TC',sans-serif; font-size:13px; resize:vertical;
+  }
+  .lg-actions{display:flex; gap:8px; margin-top:6px;}
+  .lg-actions button{
+    flex:1; padding:11px 0; border-radius:10px; border:1px solid var(--line);
+    background:var(--panel-soft); color:var(--text); font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .lg-actions button.lg-save{background:var(--legs); border-color:var(--legs); color:#10260a;}
+  .lg-msg{font-size:12px; color:var(--legs); min-height:16px; margin-top:6px;}
+
+  /* history dashboard */
+  #history{display:none;}
+  body[data-focus-mode="history"] #history{display:block;}
+  .hist-stats{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:18px;}
+  .hist-stat{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px;}
+  .hist-stat .hs-num{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--legs);}
+  .hist-stat .hs-label{font-size:11px; color:var(--text-dim); margin-top:2px;}
+  .heatmap-wrap{overflow-x:auto; padding-bottom:6px; margin-bottom:18px;}
+  .heatmap{display:flex; gap:3px;}
+  .hm-col{display:flex; flex-direction:column; gap:3px;}
+  .hm-cell{width:13px; height:13px; border-radius:3px; background:var(--panel-soft); border:1px solid var(--line);}
+  .hm-legend{display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:var(--text-dim); margin-bottom:18px;}
+  .hm-legend span{display:inline-flex; align-items:center; gap:4px;}
+  .hm-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+  .hist-list-item{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; margin-bottom:10px;
+  }
+  .hist-list-item .hl-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  .hist-list-item .hl-date{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);}
+  .hist-list-item .hl-tag{font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px;}
+  .hist-list-item .hl-note{font-size:13px; color:var(--text-dim); margin-top:6px;}
+  .hist-list-item .hl-detail{font-size:12px; color:var(--text-dim); margin-top:8px; border-top:1px solid var(--line); padding-top:8px; display:none;}
+  .hist-list-item.open .hl-detail{display:block;}
+  .hist-list-item .hl-ex{display:flex; justify-content:space-between; padding:3px 0;}
+  .hist-empty{color:var(--text-dim); font-size:13px; text-align:center; padding:30px 0;}
 </style>
 </head>
 <body data-level="beginner" data-mode="level">
@@ -226,6 +318,7 @@
   <div class="bar-row focus-row">
     <div class="focus-btn active default-btn" data-focus="all">完整訓練(全部)</div>
     <div class="focus-btn pelvic-btn" data-focus="pelvic">🦴 骨盆穩定訓練</div>
+    <div class="focus-btn hist-btn" data-focus="history">📊 訓練紀錄</div>
   </div>
   <div class="bar-label">依難度瀏覽(虛線卡=最低限度,永遠顯示)</div>
   <div class="bar-row">
@@ -515,6 +608,26 @@
   </div>
 </section>
 
+<section id="history">
+  <div class="section-head"><h2>HISTORY</h2><span class="zh">訓練紀錄</span></div>
+  <p class="desc">這裡顯示你用左下角「📝 記錄」存下的每一次訓練。沒有「連續天數」這種容易失真的指標,只給你看得到、算得清楚的數字。</p>
+  <div class="hist-stats" id="histStats">
+    <div class="hist-stat"><div class="hs-num" id="hsWeek">–</div><div class="hs-label">本週已記錄</div></div>
+    <div class="hist-stat"><div class="hs-num" id="hsMonth">–</div><div class="hs-label">本月已記錄</div></div>
+    <div class="hist-stat"><div class="hs-num" id="hsTotal">–</div><div class="hs-label">累積總紀錄</div></div>
+    <div class="hist-stat"><div class="hs-num" id="hsSince">–</div><div class="hs-label">距上次紀錄</div></div>
+  </div>
+  <div class="heatmap-wrap"><div class="heatmap" id="heatmap"></div></div>
+  <div class="hm-legend">
+    <span><i style="background:var(--push)"></i>Push</span>
+    <span><i style="background:var(--pull)"></i>Pull</span>
+    <span><i style="background:var(--legs)"></i>Legs</span>
+    <span><i style="background:var(--pelvic)"></i>骨盆穩定</span>
+    <span><i style="background:var(--panel-soft); border:1px solid var(--line);"></i>沒有紀錄</span>
+  </div>
+  <div id="historyList"><p class="hist-empty">載入中...</p></div>
+</section>
+
 <section id="poselegend">
   <div class="section-head"><h2>LEGEND</h2><span class="zh">動作姿勢圖示說明</span></div>
   <div class="pose-key">
@@ -656,6 +769,63 @@
   <button id="edExit">✕ 結束編輯</button>
 </div>
 
+<div class="log-fab" id="logFab" title="記錄訓練">📝</div>
+<div class="log-overlay" id="logOverlay">
+  <div class="log-card">
+    <h3>記錄今天的訓練</h3>
+    <p class="lg-sub">選類型和難度後,下面會列出對應的動作,輸入實際做的重量/次數即可。</p>
+
+    <div class="lg-row">
+      <span class="lg-label">日期</span>
+      <input type="date" class="lg-date" id="lgDate">
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-label">今天練的類型</span>
+      <div class="lg-chip-row" id="lgDayType">
+        <div class="lg-chip" data-day="push">Push</div>
+        <div class="lg-chip" data-day="pull">Pull</div>
+        <div class="lg-chip" data-day="legs">Legs</div>
+        <div class="lg-chip" data-day="pelvic">骨盆穩定</div>
+      </div>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-label">難度</span>
+      <div class="lg-chip-row" id="lgLevel">
+        <div class="lg-chip" data-lv="min">最低限度</div>
+        <div class="lg-chip" data-lv="beginner">初階</div>
+        <div class="lg-chip" data-lv="intermediate">中階</div>
+        <div class="lg-chip" data-lv="advanced">高階</div>
+      </div>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-label">動作紀錄(重量×次數,或時間,自由填寫)</span>
+      <div class="lg-exlist" id="lgExList"><p class="lg-empty-hint">先選上面的類型和難度</p></div>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-label">髖屈肌 / 整體緊繃度(1 = 很放鬆,10 = 很緊繃)</span>
+      <div class="lg-slider-row">
+        <input type="range" min="1" max="10" value="5" id="lgTightness">
+        <span class="lg-slider-val" id="lgTightnessVal">5</span>
+      </div>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-label">心得 / 備註(可留空)</span>
+      <textarea class="lg-note" id="lgNote" placeholder="例如:今天髖屈肌特別緊,降一階完成"></textarea>
+    </div>
+
+    <div class="lg-actions">
+      <button id="lgCancel">取消</button>
+      <button class="lg-save" id="lgSave">💾 儲存紀錄</button>
+    </div>
+    <p class="lg-msg" id="lgMsg"></p>
+  </div>
+</div>
+
 <script>
   var levelBtns = document.querySelectorAll('.level-btn');
   var equipBtns = document.querySelectorAll('.equip-btn');
@@ -670,9 +840,12 @@
   function applyFocusVisibility(){
     var activeBtn = document.querySelector('.focus-btn.active');
     var mode = activeBtn ? activeBtn.getAttribute('data-focus') : 'all';
+    document.body.setAttribute('data-focus-mode', mode);
     sections.forEach(function(s){
       if(mode === 'pelvic'){
         s.style.display = (s.id === 'pelvic') ? '' : 'none';
+      } else if(mode === 'history'){
+        s.style.display = 'none';
       } else {
         s.style.display = '';
       }
@@ -680,8 +853,9 @@
     extraIds.forEach(function(id){
       var el = document.getElementById(id);
       if(!el) return;
-      el.style.display = (mode === 'pelvic') ? 'none' : '';
+      el.style.display = (mode === 'all') ? '' : 'none';
     });
+    if(mode === 'history' && window.renderHistory){ window.renderHistory(); }
   }
 
   function resetSubHeadings(){
@@ -957,11 +1131,238 @@
       }
     }
   });
+
+  /* ===================== 訓練紀錄(記錄面板) ===================== */
+  var DAY_LABEL = { push:'Push', pull:'Pull', legs:'Legs', pelvic:'骨盆穩定' };
+  var LEVEL_LABEL = { min:'最低限度', beginner:'初階', intermediate:'中階', advanced:'高階' };
+  var lgState = { day:null, level:null };
+
+  function todayStr(){
+    var d = new Date();
+    var m = String(d.getMonth()+1).padStart(2,'0');
+    var day = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
+  }
+  document.getElementById('lgDate').value = todayStr();
+
+  function openLogPanel(){
+    document.getElementById('logOverlay').classList.add('open');
+    document.getElementById('lgMsg').textContent = '';
+  }
+  function closeLogPanel(){
+    document.getElementById('logOverlay').classList.remove('open');
+  }
+  document.getElementById('logFab').addEventListener('click', openLogPanel);
+  document.getElementById('lgCancel').addEventListener('click', closeLogPanel);
+  document.getElementById('logOverlay').addEventListener('click', function(e){
+    if(e.target.id === 'logOverlay') closeLogPanel();
+  });
+
+  function renderLgExList(){
+    var box = document.getElementById('lgExList');
+    if(!lgState.day || !lgState.level){
+      box.innerHTML = '<p class="lg-empty-hint">先選上面的類型和難度</p>';
+      return;
+    }
+    var section = document.getElementById(lgState.day);
+    if(!section){ box.innerHTML = '<p class="lg-empty-hint">找不到對應內容</p>'; return; }
+    var names = lgState.level === 'min'
+      ? section.querySelectorAll('.card-min .mv-name')
+      : section.querySelectorAll('.lvl-' + lgState.level + ' .mv-name');
+    if(!names.length){
+      box.innerHTML = '<p class="lg-empty-hint">這個組合目前沒有對應動作</p>';
+      return;
+    }
+    var html = '';
+    names.forEach(function(nameEl){
+      html += '<div class="lg-ex-row"><span class="lg-ex-name">' + nameEl.textContent + '</span>'
+        + '<input type="text" placeholder="例如 12kg×10,10,9 或 30秒"></div>';
+    });
+    box.innerHTML = html;
+  }
+
+  document.querySelectorAll('#lgDayType .lg-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      document.querySelectorAll('#lgDayType .lg-chip').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      lgState.day = chip.getAttribute('data-day');
+      renderLgExList();
+    });
+  });
+  document.querySelectorAll('#lgLevel .lg-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      document.querySelectorAll('#lgLevel .lg-chip').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      lgState.level = chip.getAttribute('data-lv');
+      renderLgExList();
+    });
+  });
+
+  document.getElementById('lgTightness').addEventListener('input', function(){
+    document.getElementById('lgTightnessVal').textContent = this.value;
+  });
+
+  document.getElementById('lgSave').addEventListener('click', function(){
+    var msg = document.getElementById('lgMsg');
+    if(!lgState.day || !lgState.level){
+      msg.textContent = '請先選類型和難度';
+      msg.style.color = '#ff6b35';
+      return;
+    }
+    var dateStr = document.getElementById('lgDate').value || todayStr();
+    var exercises = [];
+    document.querySelectorAll('#lgExList .lg-ex-row').forEach(function(row){
+      var name = row.querySelector('.lg-ex-name').textContent;
+      var val = row.querySelector('input').value.trim();
+      exercises.push({ name: name, detail: val });
+    });
+    var logObj = {
+      date: dateStr,
+      dayType: lgState.day,
+      level: lgState.level,
+      tightness: parseInt(document.getElementById('lgTightness').value, 10),
+      note: document.getElementById('lgNote').value.trim(),
+      exercises: exercises,
+      savedAt: Date.now()
+    };
+    if(!window.cloudSaveLog){
+      msg.textContent = '雲端尚未連接,無法儲存';
+      msg.style.color = '#ff6b35';
+      return;
+    }
+    msg.textContent = '儲存中...';
+    msg.style.color = '';
+    window.cloudSaveLog(dateStr, logObj).then(function(){
+      msg.textContent = '已儲存!';
+      msg.style.color = 'var(--legs)';
+      setTimeout(closeLogPanel, 900);
+    }).catch(function(err){
+      console.error(err);
+      msg.textContent = '儲存失敗,請檢查網路連線';
+      msg.style.color = '#ff6b35';
+    });
+  });
+
+  /* ===================== 訓練紀錄(歷史儀表板) ===================== */
+  function dateOnly(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function parseLogDate(id){
+    var p = id.split('-');
+    return new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+  }
+  function startOfWeek(d){
+    var c = new Date(d);
+    c.setDate(c.getDate() - c.getDay());
+    return c;
+  }
+
+  function renderHistStats(logs){
+    var today = dateOnly(new Date());
+    var weekStart = startOfWeek(today);
+    var monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    var weekCount = 0, monthCount = 0;
+    logs.forEach(function(l){
+      var d = parseLogDate(l.id);
+      if(d >= weekStart) weekCount++;
+      if(d >= monthStart) monthCount++;
+    });
+    document.getElementById('hsWeek').textContent = weekCount;
+    document.getElementById('hsMonth').textContent = monthCount;
+    document.getElementById('hsTotal').textContent = logs.length;
+    var sinceText = '–';
+    if(logs.length){
+      var diffDays = Math.round((today - parseLogDate(logs[0].id)) / 86400000);
+      sinceText = diffDays === 0 ? '今天' : (diffDays + ' 天前');
+    }
+    document.getElementById('hsSince').textContent = sinceText;
+  }
+
+  function renderHeatmap(logs){
+    var byDate = {};
+    logs.forEach(function(l){ byDate[l.id] = l; });
+    var container = document.getElementById('heatmap');
+    container.innerHTML = '';
+    var weeks = 12;
+    var today = dateOnly(new Date());
+    var end = startOfWeek(today);
+    end.setDate(end.getDate() + 6);
+    var cursor = new Date(end);
+    cursor.setDate(cursor.getDate() - (weeks*7 - 1));
+    for(var w=0; w<weeks; w++){
+      var col = document.createElement('div');
+      col.className = 'hm-col';
+      for(var d=0; d<7; d++){
+        var cell = document.createElement('div');
+        cell.className = 'hm-cell';
+        var key = cursor.getFullYear()+'-'+String(cursor.getMonth()+1).padStart(2,'0')+'-'+String(cursor.getDate()).padStart(2,'0');
+        if(cursor > today){
+          cell.style.visibility = 'hidden';
+        } else {
+          var log = byDate[key];
+          if(log){
+            var color = getComputedStyle(document.documentElement).getPropertyValue('--'+log.dayType).trim();
+            if(color){ cell.style.background = color; cell.style.borderColor = color; }
+            cell.title = key + ' · ' + (DAY_LABEL[log.dayType] || log.dayType);
+          } else {
+            cell.title = key;
+          }
+        }
+        col.appendChild(cell);
+        cursor.setDate(cursor.getDate()+1);
+      }
+      container.appendChild(col);
+    }
+  }
+
+  function renderHistList(logs){
+    var box = document.getElementById('historyList');
+    if(!logs.length){
+      box.innerHTML = '<p class="hist-empty">還沒有任何紀錄,點左下角 📝 開始記錄第一次吧</p>';
+      return;
+    }
+    var html = '';
+    logs.forEach(function(l){
+      var color = 'var(--' + (l.dayType || 'legs') + ')';
+      var exHtml = '';
+      (l.exercises || []).forEach(function(ex){
+        if(ex.detail) exHtml += '<div class="hl-ex"><span>'+ex.name+'</span><span>'+ex.detail+'</span></div>';
+      });
+      var noteLine = '';
+      if(l.tightness){ noteLine = '緊繃度 '+l.tightness+'/10' + (l.note ? '・'+l.note : ''); }
+      else if(l.note){ noteLine = l.note; }
+      html += '<div class="hist-list-item"><div class="hl-top">'
+        + '<span class="hl-date">'+l.id+'</span>'
+        + '<span class="hl-tag" style="background:'+color+';color:#10260a;">'+(DAY_LABEL[l.dayType]||l.dayType)+' · '+(LEVEL_LABEL[l.level]||l.level)+'</span>'
+        + '</div>'
+        + (noteLine ? '<div class="hl-note">'+noteLine+'</div>' : '')
+        + (exHtml ? '<div class="hl-detail">'+exHtml+'</div>' : '')
+        + '</div>';
+    });
+    box.innerHTML = html;
+    box.querySelectorAll('.hist-list-item').forEach(function(item){
+      item.addEventListener('click', function(){ item.classList.toggle('open'); });
+    });
+  }
+
+  window.renderHistory = function(){
+    if(!window.cloudLoadAllLogs){
+      document.getElementById('historyList').innerHTML = '<p class="hist-empty">尚未連接雲端</p>';
+      return;
+    }
+    document.getElementById('historyList').innerHTML = '<p class="hist-empty">載入中...</p>';
+    window.cloudLoadAllLogs().then(function(logs){
+      renderHistStats(logs);
+      renderHeatmap(logs);
+      renderHistList(logs);
+    }).catch(function(err){
+      console.error(err);
+      document.getElementById('historyList').innerHTML = '<p class="hist-empty">載入失敗,請檢查網路連線</p>';
+    });
+  };
 </script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   var firebaseConfig = {
     apiKey: "AIzaSyD68ASVlyKiBOdvcyqIjil1DLNhibaxiaM",
@@ -987,6 +1388,21 @@
 
   window.cloudSaveEdits = function(editsObj){
     return setDoc(editsDocRef, { data: editsObj, updatedAt: Date.now() });
+  };
+
+  /* ---- training logs ---- */
+  window.cloudSaveLog = function(dateStr, logObj){
+    var ref = doc(db, "pplLogs", dateStr);
+    return setDoc(ref, logObj);
+  };
+
+  window.cloudLoadAllLogs = function(){
+    return getDocs(collection(db, "pplLogs")).then(function(snap){
+      var arr = [];
+      snap.forEach(function(d){ arr.push(Object.assign({ id: d.id }, d.data())); });
+      arr.sort(function(a,b){ return a.id < b.id ? 1 : -1; }); // 新到舊
+      return arr;
+    });
   };
 
   if(window.initCloudSync){ window.initCloudSync(); }
